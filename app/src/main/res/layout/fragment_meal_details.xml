@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/meal_detail_layout_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".features.mealdetails.MealDetailsFragment">
+
+    <ImageView
+        android:id="@+id/meal_img"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/meal_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:gravity="center"
+        android:text="Meal name"
+        app:layout_constraintBottom_toBottomOf="@+id/meal_img"
+        app:layout_constraintEnd_toEndOf="@+id/meal_img"
+        app:layout_constraintStart_toStartOf="@+id/meal_img" />
+
+    <android.support.v7.widget.GridLayout
+        android:id="@+id/grid_ingredients_layout"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/meal_img"
+        app:layout_constraintHorizontal_bias="0.6"
+        app:layout_constraintStart_toStartOf="@+id/meal_img"
+        app:layout_constraintTop_toBottomOf="@+id/meal_img">
+
+    </android.support.v7.widget.GridLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/meal_img"
+        app:layout_constraintStart_toStartOf="@+id/meal_img"
+        app:layout_constraintTop_toBottomOf="@+id/grid_ingredients_layout"
+        app:layout_goneMarginBottom="8dp">
+
+        <TextView
+            android:id="@+id/meal_description"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/some_text" />
+    </android.support.v4.widget.NestedScrollView>
+
+</android.support.constraint.ConstraintLayout>
