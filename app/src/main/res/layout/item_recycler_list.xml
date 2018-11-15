@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+<android.support.constraint.ConstraintLayout
+android:id="@+id/root_list_item"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:padding="5sp"
+tools:context="com.jaszczurowskip.cookbook.features.mealslist.MealsListActivity">
+
+    <ImageView
+        android:id="@+id/imgv_list_item"
+        android:layout_width="70sp"
+        android:layout_height="70sp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:alpha=".86"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/btn_star_big_on" />
+
+    <TextView
+        android:id="@+id/meal_name"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:gravity="center_vertical"
+        android:text="@string/some_meal_name"
+        app:layout_constraintBottom_toBottomOf="@+id/imgv_list_item"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imgv_list_item"
+        app:layout_constraintTop_toTopOf="@+id/imgv_list_item"
+        tools:text="content_description" />
+
+</android.support.constraint.ConstraintLayout>
+</layout>
