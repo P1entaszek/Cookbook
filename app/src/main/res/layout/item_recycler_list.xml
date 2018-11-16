@@ -22,7 +22,7 @@ tools:context="com.jaszczurowskip.cookbook.features.mealslist.MealsListActivity"
         app:srcCompat="@android:drawable/btn_star_big_on" />
 
     <TextView
-        android:id="@+id/meal_name"
+        android:id="@+id/meal_name_tv"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginEnd="8dp"

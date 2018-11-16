@@ -10,7 +10,7 @@ import com.jaszczurowskip.cookbook.features.mealdetails.MealDetailsActivity;
  */
 public class Utils {
 
-    public static void startDetailActivity(Context context, Class mClass) {
+    public static void startAnotherActivity(Context context, Class mClass) {
         Intent i = new Intent(context, mClass);
         context.startActivity(i);
     }

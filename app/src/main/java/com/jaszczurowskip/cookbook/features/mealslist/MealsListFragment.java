@@ -38,7 +38,7 @@ public class MealsListFragment extends Fragment {
         fragmentMealsListBinding.addNewMealFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Utils.startDetailActivity(getContext(), AddNewMealActivity.class);
+                Utils.startAnotherActivity(getContext(), AddNewMealActivity.class);
             }
         });
     }
