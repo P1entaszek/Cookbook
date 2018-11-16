@@ -1,10 +1,6 @@
 package com.jaszczurowskip.cookbook.features.mealslist;
 
-import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
@@ -13,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.features.mealdetails.MealDetailsActivity;
@@ -59,14 +54,14 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.CustomView> {
         CustomView(final View itemView) {
             super(itemView);
             this.mealImage = itemView.findViewById(R.id.meal_img);
-            this.mealName = itemView.findViewById(R.id.meal_name);
+            this.mealName = itemView.findViewById(R.id.meal_name_tv);
             this.constraintLayout = itemView.findViewById(R.id.root_list_item);
             constraintLayout.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            Utils.startDetailActivity(context, MealDetailsActivity.class);
+            Utils.startAnotherActivity(context, MealDetailsActivity.class);
         }
     }
 
