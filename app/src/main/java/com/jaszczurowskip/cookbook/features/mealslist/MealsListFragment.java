@@ -11,8 +11,18 @@ import android.view.ViewGroup;
 
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.databinding.FragmentMealsListBinding;
+import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
+import com.jaszczurowskip.cookbook.datasource.retrofit.ApiService;
+import com.jaszczurowskip.cookbook.datasource.retrofit.RetrofitClient;
 import com.jaszczurowskip.cookbook.features.addnewmeal.AddNewMealActivity;
 import com.jaszczurowskip.cookbook.utils.Utils;
+import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
+
+import java.util.List;
+
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import retrofit2.Retrofit;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -20,6 +30,10 @@ import com.jaszczurowskip.cookbook.utils.Utils;
 public class MealsListFragment extends Fragment {
     private ListAdapter adapter;
     private FragmentMealsListBinding fragmentMealsListBinding;
+    Retrofit retrofit;
+    CompositeDisposable compositeDisposable = new CompositeDisposable();
+    ApiService apiService;
+    List<DishesApiModel> dishes;
 
     public MealsListFragment() {
         // Required empty public constructor
@@ -31,9 +45,25 @@ public class MealsListFragment extends Fragment {
 
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        retrofit = RetrofitClient.getRetrofitInstance();
+        apiService = retrofit.create(ApiService.class);
+        compositeDisposable.add(apiService.getAllDishes()
+                .subscribeOn(AppSchedulersProvider.getInstance().io())
+                .observeOn(AppSchedulersProvider.getInstance().ui())
+                .subscribe(new Consumer<List<DishesApiModel>>() {
+                    @Override
+                    public void accept(List<DishesApiModel> apiModels) throws Exception {
+                        displayData(apiModels);
+                    }
+                }));
+
+    }
+
+
+    private void displayData(List<DishesApiModel> apiModels) {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         fragmentMealsListBinding.mealsListRecycler.setLayoutManager(layoutManager);
-        adapter = new ListAdapter(getContext());
+        adapter = new ListAdapter(getContext(),apiModels);
         fragmentMealsListBinding.mealsListRecycler.setAdapter(adapter);
         fragmentMealsListBinding.addNewMealFab.setOnClickListener(new View.OnClickListener() {
             @Override

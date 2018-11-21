@@ -15,10 +15,12 @@ import android.widget.Toast;
 
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.databinding.FragmentAddNewMealBinding;
-import com.jaszczurowskip.cookbook.features.IngredientsGridAdapter;
+import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
+import com.jaszczurowskip.cookbook.features.mealdetails.IngredientsDetailsGridAdapter;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -28,23 +30,7 @@ import static android.app.Activity.RESULT_OK;
 public class AddNewMealFragment extends Fragment {
     private static int RESULT_LOAD_IMG = 0;
     private FragmentAddNewMealBinding fragmentAddNewMealBinding;
-    String[] list = {
-            "Google",
-            "Github",
-            "Instagram",
-            "Facebook",
-            "Flickr",
-            "Pinterest",
-            "Quora",
-            "Twitter",
-            "Vimeo",
-            "WordPress",
-            "Youtube",
-            "Stumbleupon",
-            "SoundCloud",
-            "Reddit",
-            "Blogger"
-    } ;
+    private String[] list = {"sdkjfds", "slkdjfs", "ksdjfkljsfd", "ljksdhfjsdf"};
 
     public AddNewMealFragment() {
         // Required empty public constructor
