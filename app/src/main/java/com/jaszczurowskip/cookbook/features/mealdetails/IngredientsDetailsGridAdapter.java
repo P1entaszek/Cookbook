@@ -1,4 +1,4 @@
-package com.jaszczurowskip.cookbook.features;
+package com.jaszczurowskip.cookbook.features.mealdetails;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,22 +8,25 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.jaszczurowskip.cookbook.R;
+import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
+
+import java.util.List;
 
 /**
  * Created by jaszczurowskip on 16.11.2018
  */
-public class IngredientsGridAdapter extends BaseAdapter {
+public class IngredientsDetailsGridAdapter extends BaseAdapter {
     private Context mContext;
-    private final String[] list;
+    private final List<IngredientApiModel> list;
 
-    public IngredientsGridAdapter(Context mContext, String[] list) {
+    public IngredientsDetailsGridAdapter(Context mContext, List<IngredientApiModel> list) {
         this.mContext = mContext;
         this.list = list;
     }
 
     @Override
     public int getCount() {
-        return list.length;
+        return list.size();
     }
 
     @Override
@@ -44,7 +47,7 @@ public class IngredientsGridAdapter extends BaseAdapter {
             grid = new View(mContext);
             grid = layoutInflater.inflate(R.layout.item_gridview_list, null);
             TextView txtview = grid.findViewById(R.id.ingredient);
-            txtview.setText(list[position]);
+            txtview.setText(list.get(position).getName());
         }
         else{
             grid = convertView;
