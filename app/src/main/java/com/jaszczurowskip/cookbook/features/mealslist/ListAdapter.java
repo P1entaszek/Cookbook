@@ -84,8 +84,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.CustomView> {
 
     public void startDetailActivity(int position) {
         Intent i = new Intent(context, MealDetailsActivity.class);
-        Gson gson = new Gson();
-        String dishJSon = gson.toJson(listOfData.get(position));
+        Gson gson = null;
+        String dishJSon = null;
+        gson = new Gson();
+        dishJSon = gson.toJson(listOfData.get(position));
         i.putExtra(EXTRA_ITEM_ID, dishJSon);
         context.startActivity(i);
     }
