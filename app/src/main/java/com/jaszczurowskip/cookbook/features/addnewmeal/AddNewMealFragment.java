@@ -30,7 +30,7 @@ import static android.app.Activity.RESULT_OK;
 public class AddNewMealFragment extends Fragment {
     private static int RESULT_LOAD_IMG = 0;
     private FragmentAddNewMealBinding fragmentAddNewMealBinding;
-    private String[] list = {"sdkjfds", "slkdjfs", "ksdjfkljsfd", "ljksdhfjsdf"};
+    private String[] list = {"egg", "bear", "salad", "tomatoes"};
 
     public AddNewMealFragment() {
         // Required empty public constructor
@@ -62,8 +62,6 @@ public class AddNewMealFragment extends Fragment {
     @Override
     public void onActivityResult(int reqCode, int resultCode, Intent data) {
         super.onActivityResult(reqCode, resultCode, data);
-
-
         if (resultCode == RESULT_OK) {
             try {
                 final Uri imageUri = data.getData();
