@@ -56,6 +56,12 @@ public class MealsListFragment extends Fragment {
                         displayData(apiModels);
                     }
                 }));
+        fragmentMealsListBinding.addNewMealFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Utils.startAnotherActivity(getContext(), AddNewMealActivity.class);
+            }
+        });
 
     }
 
@@ -64,12 +70,6 @@ public class MealsListFragment extends Fragment {
         fragmentMealsListBinding.mealsListRecycler.setLayoutManager(layoutManager);
         adapter = new ListAdapter(getContext(),apiModels);
         fragmentMealsListBinding.mealsListRecycler.setAdapter(adapter);
-        fragmentMealsListBinding.addNewMealFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Utils.startAnotherActivity(getContext(), AddNewMealActivity.class);
-            }
-        });
     }
 
     @Override
