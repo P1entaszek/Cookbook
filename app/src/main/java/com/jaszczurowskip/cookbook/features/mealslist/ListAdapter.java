@@ -82,13 +82,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.CustomView> {
         }
     }
 
-    public void startDetailActivity(int position) {
+    private void startDetailActivity(int position) {
         Intent i = new Intent(context, MealDetailsActivity.class);
-        Gson gson = null;
-        String dishJSon = null;
-        gson = new Gson();
-        dishJSon = gson.toJson(listOfData.get(position));
-        i.putExtra(EXTRA_ITEM_ID, dishJSon);
+        long id = listOfData.get(position).getId();
+        i.putExtra(EXTRA_ITEM_ID, String.valueOf(id));
         context.startActivity(i);
     }
 }

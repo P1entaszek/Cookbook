@@ -65,7 +65,6 @@ public class MealsListFragment extends Fragment {
 
     }
 
-
     private void displayData(List<DishesApiModel> apiModels) {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         fragmentMealsListBinding.mealsListRecycler.setLayoutManager(layoutManager);
