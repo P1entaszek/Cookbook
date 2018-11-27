@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.jaszczurowskip.cookbook.R;
@@ -20,7 +21,10 @@ import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
 import java.util.List;
 import java.util.Objects;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import retrofit2.Retrofit;
 
@@ -29,9 +33,8 @@ import retrofit2.Retrofit;
  */
 public class MealDetailsFragment extends Fragment {
     private static final String EXTRA_ITEM_ID = "EXTRA_ITEM_ID";
-    Retrofit retrofit;
-    CompositeDisposable compositeDisposable = new CompositeDisposable();
-    ApiService apiService;
+    private Retrofit retrofit;
+    private ApiService apiService;
     private FragmentMealDetailsBinding fragmentMealDetailsBinding;
     private long dishId;
 
@@ -59,15 +62,35 @@ public class MealDetailsFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         retrofit = RetrofitClient.getRetrofitInstance();
         apiService = retrofit.create(ApiService.class);
-        compositeDisposable.add(apiService.getDish(dishId)
+        getDataFromService();
+    }
+
+    private void  getDataFromService(){
+        apiService.getDish(dishId)
                 .subscribeOn(AppSchedulersProvider.getInstance().io())
                 .observeOn(AppSchedulersProvider.getInstance().ui())
-                .subscribe(new Consumer<DishesApiModel>() {
+                .subscribe(new Observer<DishesApiModel>() {
                     @Override
-                    public void accept(DishesApiModel dishesApiModel) throws Exception {
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(DishesApiModel dishesApiModel) {
                         displayData(dishesApiModel);
                     }
-                }));
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        Toast.makeText(getContext(), "Please check your internet connection", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 
     private void displayData(DishesApiModel dishesApiModel) {

@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.databinding.FragmentMealsListBinding;
@@ -20,7 +21,9 @@ import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
 
 import java.util.List;
 
+import io.reactivex.Observer;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import retrofit2.Retrofit;
 
@@ -31,9 +34,7 @@ public class MealsListFragment extends Fragment {
     private ListAdapter adapter;
     private FragmentMealsListBinding fragmentMealsListBinding;
     Retrofit retrofit;
-    CompositeDisposable compositeDisposable = new CompositeDisposable();
     ApiService apiService;
-    List<DishesApiModel> dishes;
 
     public MealsListFragment() {
         // Required empty public constructor
@@ -47,15 +48,7 @@ public class MealsListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         retrofit = RetrofitClient.getRetrofitInstance();
         apiService = retrofit.create(ApiService.class);
-        compositeDisposable.add(apiService.getAllDishes()
-                .subscribeOn(AppSchedulersProvider.getInstance().io())
-                .observeOn(AppSchedulersProvider.getInstance().ui())
-                .subscribe(new Consumer<List<DishesApiModel>>() {
-                    @Override
-                    public void accept(List<DishesApiModel> apiModels) throws Exception {
-                        displayData(apiModels);
-                    }
-                }));
+        getDataFromService();
         fragmentMealsListBinding.addNewMealFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,6 +56,34 @@ public class MealsListFragment extends Fragment {
             }
         });
 
+    }
+
+    private void  getDataFromService(){
+        apiService.getAllDishes()
+                .subscribeOn(AppSchedulersProvider.getInstance().io())
+                .observeOn(AppSchedulersProvider.getInstance().ui())
+                .subscribe(new Observer<List<DishesApiModel>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<DishesApiModel> list) {
+                        displayData(list);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        Toast.makeText(getContext(), "Please check your internet connection", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 
     private void displayData(List<DishesApiModel> apiModels) {
