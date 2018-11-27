@@ -18,7 +18,7 @@ public interface ApiService {
     Observable<List<DishesApiModel>> getAllDishes();
 
     @GET("ingredients")
-    Observable<List<IngredientApiModel>> getDishIngredients();
+    Observable<List<IngredientApiModel>> getAllIngredients();
 
     @GET("dishes/{dishId}")
     Observable<DishesApiModel> getDish(@Path("dishId") long dishID);
