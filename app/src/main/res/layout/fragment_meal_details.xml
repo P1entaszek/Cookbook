@@ -27,6 +27,7 @@
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:textSize="20sp"
             android:gravity="center"
             app:layout_constraintBottom_toBottomOf="@+id/meal_img"
             app:layout_constraintEnd_toEndOf="@+id/meal_img"
@@ -45,16 +46,14 @@
             app:layout_constraintStart_toStartOf="@+id/meal_img"
             app:layout_constraintTop_toBottomOf="@+id/meal_img">
 
-            <GridView
-                android:id="@+id/ingredients_gridview"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:columnWidth="100dp"
-                android:gravity="center"
-                android:numColumns="auto_fit"
-                android:stretchMode="columnWidth"
-                tools:layout_editor_absoluteX="0dp"
-                tools:layout_editor_absoluteY="358dp" />
+            <android.support.v7.widget.RecyclerView
+                android:orientation="vertical"
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintEnd_toEndOf="@+id/ingredients_gridview"
+                app:layout_constraintStart_toStartOf="@+id/ingredients_gridview"
+                app:layout_constraintTop_toBottomOf="@+id/ingredients_gridview" />
         </FrameLayout>
 
         <android.support.v4.widget.NestedScrollView

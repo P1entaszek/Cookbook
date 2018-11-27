@@ -15,12 +15,9 @@ import android.widget.Toast;
 
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.databinding.FragmentAddNewMealBinding;
-import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
-import com.jaszczurowskip.cookbook.features.mealdetails.IngredientsDetailsGridAdapter;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
