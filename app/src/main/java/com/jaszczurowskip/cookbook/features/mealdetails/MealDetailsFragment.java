@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.github.ybq.android.spinkit.sprite.Sprite;
+import com.github.ybq.android.spinkit.style.FadingCircle;
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.databinding.FragmentMealDetailsBinding;
 import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
@@ -21,11 +23,8 @@ import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
 import java.util.List;
 import java.util.Objects;
 
-import io.reactivex.Observable;
 import io.reactivex.Observer;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import retrofit2.Retrofit;
 
 /**
@@ -37,6 +36,7 @@ public class MealDetailsFragment extends Fragment {
     private ApiService apiService;
     private FragmentMealDetailsBinding fragmentMealDetailsBinding;
     private long dishId;
+    private Sprite progressBar;
 
     public MealDetailsFragment() {
         // Required empty public constructor
@@ -60,19 +60,29 @@ public class MealDetailsFragment extends Fragment {
 
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        retrofit = RetrofitClient.getRetrofitInstance();
-        apiService = retrofit.create(ApiService.class);
-        getDataFromService();
+        initRetrofit();
+        initView();
     }
 
-    private void  getDataFromService(){
+    private void initView() {
+        progressBar = new FadingCircle();
+        fragmentMealDetailsBinding.progressBar.setIndeterminateDrawable(progressBar);
+        fetchDataFromRemote();
+    }
+
+    private void initRetrofit() {
+        retrofit = RetrofitClient.getRetrofitInstance();
+        apiService = retrofit.create(ApiService.class);
+    }
+
+    private void fetchDataFromRemote(){
         apiService.getDish(dishId)
                 .subscribeOn(AppSchedulersProvider.getInstance().io())
                 .observeOn(AppSchedulersProvider.getInstance().ui())
                 .subscribe(new Observer<DishesApiModel>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                    //no-op
                     }
 
                     @Override
@@ -83,20 +93,21 @@ public class MealDetailsFragment extends Fragment {
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        Toast.makeText(getContext(), "Please check your internet connection", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), R.string.Please_check_your_internet_connection, Toast.LENGTH_LONG).show();
                     }
 
                     @Override
                     public void onComplete() {
-
+                        fragmentMealDetailsBinding.progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
     }
 
     private void displayData(DishesApiModel dishesApiModel) {
         List<IngredientApiModel> ingredientList;
+        IngredientsDetailsGridAdapter adapter;
         ingredientList = dishesApiModel.getIngredients();
-        IngredientsDetailsGridAdapter adapter = new IngredientsDetailsGridAdapter(getContext(), ingredientList);
+        adapter = new IngredientsDetailsGridAdapter(getContext(), ingredientList);
         fragmentMealDetailsBinding.ingredientsGridview.setAdapter(adapter);
         fragmentMealDetailsBinding.mealNameTv.setText(dishesApiModel.getName());
         fragmentMealDetailsBinding.mealDescriptionTv.setText(dishesApiModel.getRecipe());
