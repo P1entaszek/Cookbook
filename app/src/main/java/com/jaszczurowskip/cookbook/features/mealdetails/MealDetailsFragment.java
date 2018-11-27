@@ -12,6 +12,9 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.github.ybq.android.spinkit.sprite.Sprite;
 import com.github.ybq.android.spinkit.style.FadingCircle;
+import com.google.android.flexbox.FlexDirection;
+import com.google.android.flexbox.FlexboxLayoutManager;
+import com.google.android.flexbox.JustifyContent;
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.databinding.FragmentMealDetailsBinding;
 import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
@@ -20,6 +23,7 @@ import com.jaszczurowskip.cookbook.datasource.retrofit.ApiService;
 import com.jaszczurowskip.cookbook.datasource.retrofit.RetrofitClient;
 import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,6 +41,7 @@ public class MealDetailsFragment extends Fragment {
     private FragmentMealDetailsBinding fragmentMealDetailsBinding;
     private long dishId;
     private Sprite progressBar;
+    private IngredientsRecyclerAdapter ingredientsRecyclerAdapter;
 
     public MealDetailsFragment() {
         // Required empty public constructor
@@ -104,11 +109,12 @@ public class MealDetailsFragment extends Fragment {
     }
 
     private void displayData(DishesApiModel dishesApiModel) {
-        List<IngredientApiModel> ingredientList;
-        IngredientsDetailsGridAdapter adapter;
-        ingredientList = dishesApiModel.getIngredients();
-        adapter = new IngredientsDetailsGridAdapter(getContext(), ingredientList);
-        fragmentMealDetailsBinding.ingredientsGridview.setAdapter(adapter);
+        FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
+        layoutManager.setFlexDirection(FlexDirection.ROW);
+        layoutManager.setJustifyContent(JustifyContent.FLEX_START);
+        fragmentMealDetailsBinding.recyclerView.setLayoutManager(layoutManager);
+        ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(),dishesApiModel.getIngredients());
+        fragmentMealDetailsBinding.recyclerView.setAdapter(ingredientsRecyclerAdapter);
         fragmentMealDetailsBinding.mealNameTv.setText(dishesApiModel.getName());
         fragmentMealDetailsBinding.mealDescriptionTv.setText(dishesApiModel.getRecipe());
         Glide.with(getContext()).load(dishesApiModel.getPicture()).into(fragmentMealDetailsBinding.mealImg);
