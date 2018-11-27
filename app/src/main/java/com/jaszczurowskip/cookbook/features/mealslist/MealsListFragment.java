@@ -5,11 +5,14 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.github.ybq.android.spinkit.sprite.Sprite;
+import com.github.ybq.android.spinkit.style.FadingCircle;
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.databinding.FragmentMealsListBinding;
 import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
@@ -22,19 +25,17 @@ import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
 import java.util.List;
 
 import io.reactivex.Observer;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import retrofit2.Retrofit;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class MealsListFragment extends Fragment {
-    private ListAdapter adapter;
     private FragmentMealsListBinding fragmentMealsListBinding;
-    Retrofit retrofit;
-    ApiService apiService;
+    private Retrofit retrofit;
+    private ApiService apiService;
+    private Sprite progressBar;
 
     public MealsListFragment() {
         // Required empty public constructor
@@ -46,26 +47,39 @@ public class MealsListFragment extends Fragment {
 
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        initRetrofit();
+        initView();
+        setListeners();
+    }
+
+    private void initRetrofit() {
         retrofit = RetrofitClient.getRetrofitInstance();
         apiService = retrofit.create(ApiService.class);
-        getDataFromService();
+    }
+
+    private void initView() {
+        progressBar = new FadingCircle();
+        fragmentMealsListBinding.progressBar.setIndeterminateDrawable(progressBar);
+        fetchDataFromRemote();
+    }
+
+    private void setListeners() {
         fragmentMealsListBinding.addNewMealFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Utils.startAnotherActivity(getContext(), AddNewMealActivity.class);
             }
         });
-
     }
 
-    private void  getDataFromService(){
+    private void fetchDataFromRemote(){
         apiService.getAllDishes()
                 .subscribeOn(AppSchedulersProvider.getInstance().io())
                 .observeOn(AppSchedulersProvider.getInstance().ui())
                 .subscribe(new Observer<List<DishesApiModel>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                    //no-op
                     }
 
                     @Override
@@ -76,20 +90,22 @@ public class MealsListFragment extends Fragment {
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        Toast.makeText(getContext(), "Please check your internet connection", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), R.string.Please_check_your_internet_connection, Toast.LENGTH_LONG).show();
                     }
 
                     @Override
                     public void onComplete() {
-
+                        fragmentMealsListBinding.progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
     }
 
-    private void displayData(List<DishesApiModel> apiModels) {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+    private void displayData(List<DishesApiModel> dishes) {
+        ListAdapter adapter;
+        LinearLayoutManager layoutManager;
+        layoutManager = new LinearLayoutManager(getActivity());
         fragmentMealsListBinding.mealsListRecycler.setLayoutManager(layoutManager);
-        adapter = new ListAdapter(getContext(),apiModels);
+        adapter = new ListAdapter(getContext(), dishes);
         fragmentMealsListBinding.mealsListRecycler.setAdapter(adapter);
     }
 
