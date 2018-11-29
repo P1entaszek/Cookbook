@@ -17,12 +17,15 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.flexbox.FlexDirection;
+import com.google.android.flexbox.FlexboxLayoutManager;
+import com.google.android.flexbox.JustifyContent;
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.databinding.FragmentAddNewMealBinding;
 import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
 import com.jaszczurowskip.cookbook.datasource.retrofit.ApiService;
 import com.jaszczurowskip.cookbook.datasource.retrofit.RetrofitClient;
-import com.jaszczurowskip.cookbook.features.IngredientsAdapter;
+import com.jaszczurowskip.cookbook.features.IngredientsRecyclerAdapter;
 import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
 
 import java.io.FileNotFoundException;
@@ -44,12 +47,12 @@ import static android.app.Activity.RESULT_OK;
 public class AddNewMealFragment extends Fragment {
     private static int RESULT_LOAD_IMG = 0;
     private FragmentAddNewMealBinding fragmentAddNewMealBinding;
-    private ArrayList<String> listItems = new ArrayList<>();
+    private ArrayList<String> listSpinnerItems = new ArrayList<>();
     private LinkedHashSet<String> addingNewIngredientToDishHashSet = new LinkedHashSet<>();
-    private ArrayList<String> ingredientArrayList = new ArrayList<>();
-    private IngredientsAdapter adapter;
     private Retrofit retrofit;
     private ApiService apiService;
+    private ArrayList<IngredientApiModel> ingredientArrayList = new ArrayList<>();
+    private ArrayList<IngredientApiModel> choosenIngredients = new ArrayList<>();
 
     public AddNewMealFragment() {
         // Required empty public constructor
@@ -62,10 +65,8 @@ public class AddNewMealFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         initApiService();
-        listItems.add(getString(R.string.choose_some_ingredients));
+        listSpinnerItems.add(getString(R.string.choose_some_ingredients));
         fetchIngredientsFromRemoteWithSpinner();
-        adapter = new IngredientsAdapter(getContext(), ingredientArrayList);
-        fragmentAddNewMealBinding.ingredientsGridview.setAdapter(adapter);
         photoPickerListener();
         addNewIngredientToSpinner();
         addNewIngredientToDish();
@@ -84,17 +85,18 @@ public class AddNewMealFragment extends Fragment {
                 .subscribe(new Observer<List<IngredientApiModel>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        //no-op
                     }
 
                     @Override
                     public void onNext(List<IngredientApiModel> ingredientApiModels) {
-                        listItems.clear();
-                        listItems.add(getString(R.string.choose_some_ingredients));
+                        listSpinnerItems.clear();
+                        listSpinnerItems.add(getString(R.string.choose_some_ingredients));
                         for (int i = 0; i < ingredientApiModels.size(); i++) {
-                            listItems.add(ingredientApiModels.get(i).getName());
+                            listSpinnerItems.add(ingredientApiModels.get(i).getName());
+                            ingredientArrayList.add(ingredientApiModels.get(i));
                         }
-                        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, listItems);
+                        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, listSpinnerItems);
                         fragmentAddNewMealBinding.ingredientsSpinner.setAdapter(arrayAdapter);
                     }
 
@@ -106,7 +108,7 @@ public class AddNewMealFragment extends Fragment {
 
                     @Override
                     public void onComplete() {
-
+                    //no-op
                     }
                 });
     }
@@ -126,23 +128,23 @@ public class AddNewMealFragment extends Fragment {
                                     .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
                                     .subscribe(new Observer<String>() {
                                         @Override
-                                        public void onSubscribe(Disposable d) {
-
+                                        public void onSubscribe(Disposable d){
+                                            //no-op
                                         }
 
                                         @Override
                                         public void onNext(String s) {
-
+                                            //no-op
                                         }
 
                                         @Override
                                         public void onError(Throwable e) {
-
+                                            e.printStackTrace();
                                         }
 
                                         @Override
                                         public void onComplete() {
-
+                                            //no-op
                                         }
                                     });
                         } else {
@@ -156,7 +158,7 @@ public class AddNewMealFragment extends Fragment {
     }
 
     private void addNewIngredientToDish() {
-        final ArrayAdapter<String> arrayAdapterGrid = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, listItems);
+        final ArrayAdapter<String> arrayAdapterGrid = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, listSpinnerItems);
         fragmentAddNewMealBinding.ingredientsSpinner.setAdapter(arrayAdapterGrid);
         fragmentAddNewMealBinding.ingredientsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -164,9 +166,14 @@ public class AddNewMealFragment extends Fragment {
                 if (parent.getItemAtPosition(position).toString().equals("Choose some ingredients")) {
                 } else {
                     if (addingNewIngredientToDishHashSet.add(parent.getItemAtPosition(position).toString())) {
-                        ingredientArrayList.add(parent.getItemAtPosition(position).toString());
-                        adapter = new IngredientsAdapter(getContext(), ingredientArrayList);
-                        fragmentAddNewMealBinding.ingredientsGridview.setAdapter(adapter);
+                        FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
+                        layoutManager.setFlexDirection(FlexDirection.ROW);
+                        layoutManager.setJustifyContent(JustifyContent.FLEX_START);
+                        fragmentAddNewMealBinding.ingredientsRv.setLayoutManager(layoutManager);
+                        choosenIngredients.add(ingredientArrayList.get(position));
+                        IngredientsRecyclerAdapter ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), choosenIngredients);
+                        fragmentAddNewMealBinding.ingredientsRv.setAdapter(ingredientsRecyclerAdapter);
+
                     } else {
                         Toast.makeText(getContext(), "Element is in dish", Toast.LENGTH_LONG).show();
                     }
@@ -175,7 +182,7 @@ public class AddNewMealFragment extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                //no-op
             }
         });
     }
