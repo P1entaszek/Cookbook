@@ -6,7 +6,9 @@ import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
 import java.util.List;
 
 import io.reactivex.Observable;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 /**
@@ -23,4 +25,6 @@ public interface ApiService {
     @GET("dishes/{dishId}")
     Observable<DishesApiModel> getDish(@Path("dishId") long dishID);
 
+    @POST("ingredients")
+    Observable<String> getIngredient(@Body String string);
 }
