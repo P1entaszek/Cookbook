@@ -5,7 +5,6 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +22,7 @@ import com.jaszczurowskip.cookbook.utils.Utils;
 import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -72,14 +72,15 @@ public class MealsListFragment extends Fragment {
         });
     }
 
-    private void fetchDataFromRemote(){
+    private void fetchDataFromRemote() {
         apiService.getAllDishes()
                 .subscribeOn(AppSchedulersProvider.getInstance().io())
                 .observeOn(AppSchedulersProvider.getInstance().ui())
+                .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
                 .subscribe(new Observer<List<DishesApiModel>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-                    //no-op
+                        //no-op
                     }
 
                     @Override

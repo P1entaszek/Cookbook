@@ -18,13 +18,11 @@ import com.google.android.flexbox.JustifyContent;
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.databinding.FragmentMealDetailsBinding;
 import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
-import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
 import com.jaszczurowskip.cookbook.datasource.retrofit.ApiService;
 import com.jaszczurowskip.cookbook.datasource.retrofit.RetrofitClient;
+import com.jaszczurowskip.cookbook.features.IngredientsRecyclerAdapter;
 import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 import io.reactivex.Observer;
@@ -80,14 +78,14 @@ public class MealDetailsFragment extends Fragment {
         apiService = retrofit.create(ApiService.class);
     }
 
-    private void fetchDataFromRemote(){
+    private void fetchDataFromRemote() {
         apiService.getDish(dishId)
                 .subscribeOn(AppSchedulersProvider.getInstance().io())
                 .observeOn(AppSchedulersProvider.getInstance().ui())
                 .subscribe(new Observer<DishesApiModel>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-                    //no-op
+                        //no-op
                     }
 
                     @Override
@@ -113,7 +111,7 @@ public class MealDetailsFragment extends Fragment {
         layoutManager.setFlexDirection(FlexDirection.ROW);
         layoutManager.setJustifyContent(JustifyContent.FLEX_START);
         fragmentMealDetailsBinding.recyclerView.setLayoutManager(layoutManager);
-        ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(),dishesApiModel.getIngredients());
+        ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), dishesApiModel.getIngredients());
         fragmentMealDetailsBinding.recyclerView.setAdapter(ingredientsRecyclerAdapter);
         fragmentMealDetailsBinding.mealNameTv.setText(dishesApiModel.getName());
         fragmentMealDetailsBinding.mealDescriptionTv.setText(dishesApiModel.getRecipe());

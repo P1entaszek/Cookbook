@@ -1,4 +1,4 @@
-package com.jaszczurowskip.cookbook.features.mealdetails;
+package com.jaszczurowskip.cookbook.features;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
