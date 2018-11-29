@@ -9,6 +9,6 @@
     <string name="some_meal_name">some meal name</string>
     <string name="Please_check_your_internet_connection">Please check your internet connection</string>
     <string name="please_type_new_ingredient">Please type new ingredient</string>
-    <string name="name_the_meal">name the meal</string>
+    <string name="name_the_meal">Name the meal</string>
     <string name="choose_some_ingredients">Choose some ingredients</string>
 </resources>
