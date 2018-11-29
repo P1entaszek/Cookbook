@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**

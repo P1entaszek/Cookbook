@@ -66,15 +66,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ingredients_spinner">
 
-
-            <GridView
-                android:id="@+id/ingredients_gridview"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:columnWidth="100dp"
-                android:gravity="center"
-                android:numColumns="auto_fit"
-                android:stretchMode="columnWidth" />
+            <android.support.v7.widget.RecyclerView
+                android:orientation="vertical"
+                android:id="@+id/ingredients_rv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
         </FrameLayout>
 
         <ScrollView
@@ -89,11 +85,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/frame_ingredients_layout">
 
-            <TextView
+            <EditText
                 android:id="@+id/meal_description_tv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="@string/some_text" />
+                android:hint="Describe recipe of the dish"/>
         </ScrollView>
 
         <Button
