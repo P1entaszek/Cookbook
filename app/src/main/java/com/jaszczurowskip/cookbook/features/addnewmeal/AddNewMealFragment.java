@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,14 +21,18 @@ import android.widget.Toast;
 import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
+import com.google.gson.Gson;
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.databinding.FragmentAddNewMealBinding;
+import com.jaszczurowskip.cookbook.datasource.model.DishModelToPost;
+import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
 import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
 import com.jaszczurowskip.cookbook.datasource.retrofit.ApiService;
 import com.jaszczurowskip.cookbook.datasource.retrofit.RetrofitClient;
 import com.jaszczurowskip.cookbook.features.IngredientsRecyclerAdapter;
 import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -53,6 +58,8 @@ public class AddNewMealFragment extends Fragment {
     private ApiService apiService;
     private ArrayList<IngredientApiModel> ingredientArrayList = new ArrayList<>();
     private ArrayList<IngredientApiModel> choosenIngredients = new ArrayList<>();
+    private Bitmap selectedImage;
+
 
     public AddNewMealFragment() {
         // Required empty public constructor
@@ -65,11 +72,74 @@ public class AddNewMealFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         initApiService();
-        listSpinnerItems.add(getString(R.string.choose_some_ingredients));
+        initView();
         fetchIngredientsFromRemoteWithSpinner();
         photoPickerListener();
         addNewIngredientToSpinner();
         addNewIngredientToDish();
+        sendNewDishToRemote();
+
+    }
+
+    public void sendNewDishToRemote(){
+        fragmentAddNewMealBinding.acceptAddingMealBttn.setOnClickListener(v -> {
+             apiService.postDish(preparedNewDishToPost())
+                     .subscribeOn(AppSchedulersProvider.getInstance().io())
+                     .observeOn(AppSchedulersProvider.getInstance().ui())
+                     .retryWhen(throwables -> throwables.delay(1, TimeUnit.MICROSECONDS))
+                     .subscribe(new Observer<DishModelToPost>() {
+                         @Override
+                         public void onSubscribe(Disposable d) {
+                            //no-op
+                         }
+
+                         @Override
+                         public void onNext(DishModelToPost dish) {
+                            //no-op
+                         }
+
+                         @Override
+                         public void onError(Throwable e) {
+                            e.printStackTrace();
+                             Toast.makeText(getContext(), R.string.Please_check_your_internet_connection, Toast.LENGTH_LONG).show();
+                         }
+
+                         @Override
+                         public void onComplete() {
+                             Toast.makeText(getContext(), R.string.dish_added, Toast.LENGTH_LONG).show();
+                         }
+                     });
+        });
+    }
+    private DishModelToPost preparedNewDishToPost() {
+        String typeOfData = "data:image/jpeg;base64,";
+        String preparedImageToPost = typeOfData.concat(encodeToBase64(selectedImage, Bitmap.CompressFormat.JPEG, 5));
+        DishModelToPost newDish = new DishModelToPost();
+        newDish.setName(fragmentAddNewMealBinding.mealNameEt.getText().toString());
+        newDish.setRecipe(fragmentAddNewMealBinding.mealDescriptionTv.getText().toString());
+        newDish.setPicture(preparedImageToPost);
+        ArrayList<Long> ingredientsIds = new ArrayList<>();
+        for(int i=0; i<choosenIngredients.size(); i++){
+            ingredientsIds.add(i, choosenIngredients.get(i).getId());
+        }
+        newDish.setIngredientIds(ingredientsIds);
+        Gson gson = new Gson();
+        String s = gson.toJson(newDish);
+        return newDish;
+    }
+
+    public static String encodeToBase64(Bitmap image, Bitmap.CompressFormat compressFormat, int quality) {
+        ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
+        image.compress(compressFormat, quality, byteArrayOS);
+        return Base64.encodeToString(byteArrayOS.toByteArray(), Base64.NO_WRAP);
+    }
+
+    private void initView() {
+        FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
+        layoutManager.setFlexDirection(FlexDirection.ROW);
+        layoutManager.setJustifyContent(JustifyContent.FLEX_START);
+        fragmentAddNewMealBinding.ingredientsRv.setLayoutManager(layoutManager);
+        listSpinnerItems.add(getString(R.string.choose_some_ingredients));
     }
 
     private void initApiService() {
@@ -122,13 +192,13 @@ public class AddNewMealFragment extends Fragment {
                     .setPositiveButton("Add", (dialog1, which) -> {
                         String ingredient = String.valueOf(taskEditText.getText());
                         if (!ingredient.isEmpty()) {
-                            apiService.getIngredient(ingredient)
+                            apiService.postIngredient(ingredient)
                                     .subscribeOn(AppSchedulersProvider.getInstance().io())
                                     .observeOn(AppSchedulersProvider.getInstance().ui())
                                     .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
                                     .subscribe(new Observer<String>() {
                                         @Override
-                                        public void onSubscribe(Disposable d){
+                                        public void onSubscribe(Disposable d) {
                                             //no-op
                                         }
 
@@ -158,22 +228,14 @@ public class AddNewMealFragment extends Fragment {
     }
 
     private void addNewIngredientToDish() {
-        final ArrayAdapter<String> arrayAdapterGrid = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, listSpinnerItems);
-        fragmentAddNewMealBinding.ingredientsSpinner.setAdapter(arrayAdapterGrid);
         fragmentAddNewMealBinding.ingredientsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (parent.getItemAtPosition(position).toString().equals("Choose some ingredients")) {
-                } else {
+                if (!parent.getItemAtPosition(position).toString().equals("Choose some ingredients")) {
                     if (addingNewIngredientToDishHashSet.add(parent.getItemAtPosition(position).toString())) {
-                        FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
-                        layoutManager.setFlexDirection(FlexDirection.ROW);
-                        layoutManager.setJustifyContent(JustifyContent.FLEX_START);
-                        fragmentAddNewMealBinding.ingredientsRv.setLayoutManager(layoutManager);
-                        choosenIngredients.add(ingredientArrayList.get(position));
+                        choosenIngredients.add(ingredientArrayList.get(position-1));
                         IngredientsRecyclerAdapter ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), choosenIngredients);
                         fragmentAddNewMealBinding.ingredientsRv.setAdapter(ingredientsRecyclerAdapter);
-
                     } else {
                         Toast.makeText(getContext(), "Element is in dish", Toast.LENGTH_LONG).show();
                     }
@@ -202,7 +264,7 @@ public class AddNewMealFragment extends Fragment {
             try {
                 final Uri imageUri = data.getData();
                 final InputStream imageStream = getActivity().getContentResolver().openInputStream(imageUri);
-                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                selectedImage = BitmapFactory.decodeStream(imageStream);
                 fragmentAddNewMealBinding.mealNameImg.setImageBitmap(selectedImage);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

@@ -11,4 +11,5 @@
     <string name="please_type_new_ingredient">Please type new ingredient</string>
     <string name="name_the_meal">Name the meal</string>
     <string name="choose_some_ingredients">Choose some ingredients</string>
+    <string name="dish_added">Dish added</string>
 </resources>
