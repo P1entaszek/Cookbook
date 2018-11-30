@@ -1,5 +1,6 @@
 package com.jaszczurowskip.cookbook.datasource.retrofit;
 
+import com.jaszczurowskip.cookbook.datasource.model.DishModelToPost;
 import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
 import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
 
@@ -26,5 +27,8 @@ public interface ApiService {
     Observable<DishesApiModel> getDish(@Path("dishId") long dishID);
 
     @POST("ingredients")
-    Observable<String> getIngredient(@Body String string);
+    Observable<String> postIngredient(@Body String string);
+
+    @POST("dishes")
+    Observable<DishModelToPost> postDish(@Body DishModelToPost dish);
 }
