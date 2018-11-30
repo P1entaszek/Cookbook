@@ -21,11 +21,9 @@ import android.widget.Toast;
 import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
-import com.google.gson.Gson;
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.databinding.FragmentAddNewMealBinding;
 import com.jaszczurowskip.cookbook.datasource.model.DishModelToPost;
-import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
 import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
 import com.jaszczurowskip.cookbook.datasource.retrofit.ApiService;
 import com.jaszczurowskip.cookbook.datasource.retrofit.RetrofitClient;
@@ -51,6 +49,7 @@ import static android.app.Activity.RESULT_OK;
  */
 public class AddNewMealFragment extends Fragment {
     private static int RESULT_LOAD_IMG = 0;
+    private static String typeOfImage = "data:image/jpeg;base64,";
     private FragmentAddNewMealBinding fragmentAddNewMealBinding;
     private ArrayList<String> listSpinnerItems = new ArrayList<>();
     private LinkedHashSet<String> addingNewIngredientToDishHashSet = new LinkedHashSet<>();
@@ -69,6 +68,12 @@ public class AddNewMealFragment extends Fragment {
         return new AddNewMealFragment();
     }
 
+    public static String encodeToBase64(Bitmap image, Bitmap.CompressFormat compressFormat, int quality) {
+        ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
+        image.compress(compressFormat, quality, byteArrayOS);
+        return Base64.encodeToString(byteArrayOS.toByteArray(), Base64.NO_WRAP);
+    }
+
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         initApiService();
@@ -81,57 +86,75 @@ public class AddNewMealFragment extends Fragment {
 
     }
 
-    public void sendNewDishToRemote(){
+    public boolean validatePostNewDish(DishModelToPost dishModelToPost) {
+        boolean valid = true;
+        if (dishModelToPost.getIngredientIds().isEmpty()) {
+            Toast.makeText(getContext(), "Wrong filled dish form", Toast.LENGTH_LONG).show();
+            valid = false;
+        }
+        if (dishModelToPost.getName().isEmpty()) {
+            fragmentAddNewMealBinding.mealNameEt.setError("Dish must have name");
+            valid = false;
+        }
+        if (dishModelToPost.getRecipe().isEmpty()) {
+            fragmentAddNewMealBinding.mealDescriptionTv.setError("Dish must have description");
+            valid = false;
+        }
+        if (dishModelToPost.getPicture() == null) {
+            valid = false;
+            Toast.makeText(getContext(), "Wrong filled dish form", Toast.LENGTH_LONG).show();
+        }
+        return valid;
+    }
+
+    public void sendNewDishToRemote() {
         fragmentAddNewMealBinding.acceptAddingMealBttn.setOnClickListener(v -> {
-             apiService.postDish(preparedNewDishToPost())
-                     .subscribeOn(AppSchedulersProvider.getInstance().io())
-                     .observeOn(AppSchedulersProvider.getInstance().ui())
-                     .retryWhen(throwables -> throwables.delay(1, TimeUnit.MICROSECONDS))
-                     .subscribe(new Observer<DishModelToPost>() {
-                         @Override
-                         public void onSubscribe(Disposable d) {
-                            //no-op
-                         }
+            if (validatePostNewDish(preparedNewDishToPost())) {
+                apiService.postDish(preparedNewDishToPost())
+                        .subscribeOn(AppSchedulersProvider.getInstance().io())
+                        .observeOn(AppSchedulersProvider.getInstance().ui())
+                        .retryWhen(throwables -> throwables.delay(1, TimeUnit.MICROSECONDS))
+                        .subscribe(new Observer<DishModelToPost>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+                                //no-op
+                            }
 
-                         @Override
-                         public void onNext(DishModelToPost dish) {
-                            //no-op
-                         }
+                            @Override
+                            public void onNext(DishModelToPost dish) {
+                                //no-op
+                            }
 
-                         @Override
-                         public void onError(Throwable e) {
-                            e.printStackTrace();
-                             Toast.makeText(getContext(), R.string.Please_check_your_internet_connection, Toast.LENGTH_LONG).show();
-                         }
+                            @Override
+                            public void onError(Throwable e) {
+                                e.printStackTrace();
+                                Toast.makeText(getContext(), R.string.Please_check_your_internet_connection, Toast.LENGTH_LONG).show();
+                            }
 
-                         @Override
-                         public void onComplete() {
-                             Toast.makeText(getContext(), R.string.dish_added, Toast.LENGTH_LONG).show();
-                         }
-                     });
+                            @Override
+                            public void onComplete() {
+                                Toast.makeText(getContext(), R.string.dish_added, Toast.LENGTH_LONG).show();
+                            }
+                        });
+            }
         });
     }
+
     private DishModelToPost preparedNewDishToPost() {
-        String typeOfData = "data:image/jpeg;base64,";
-        String preparedImageToPost = typeOfData.concat(encodeToBase64(selectedImage, Bitmap.CompressFormat.JPEG, 5));
+        String preparedImageToPost = null;
+        if (selectedImage != null) {
+            preparedImageToPost = typeOfImage.concat(encodeToBase64(selectedImage, Bitmap.CompressFormat.JPEG, 20));
+        }
         DishModelToPost newDish = new DishModelToPost();
         newDish.setName(fragmentAddNewMealBinding.mealNameEt.getText().toString());
         newDish.setRecipe(fragmentAddNewMealBinding.mealDescriptionTv.getText().toString());
         newDish.setPicture(preparedImageToPost);
         ArrayList<Long> ingredientsIds = new ArrayList<>();
-        for(int i=0; i<choosenIngredients.size(); i++){
+        for (int i = 0; i < choosenIngredients.size(); i++) {
             ingredientsIds.add(i, choosenIngredients.get(i).getId());
         }
         newDish.setIngredientIds(ingredientsIds);
-        Gson gson = new Gson();
-        String s = gson.toJson(newDish);
         return newDish;
-    }
-
-    public static String encodeToBase64(Bitmap image, Bitmap.CompressFormat compressFormat, int quality) {
-        ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
-        image.compress(compressFormat, quality, byteArrayOS);
-        return Base64.encodeToString(byteArrayOS.toByteArray(), Base64.NO_WRAP);
     }
 
     private void initView() {
@@ -178,7 +201,7 @@ public class AddNewMealFragment extends Fragment {
 
                     @Override
                     public void onComplete() {
-                    //no-op
+                        //no-op
                     }
                 });
     }
@@ -233,7 +256,7 @@ public class AddNewMealFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (!parent.getItemAtPosition(position).toString().equals("Choose some ingredients")) {
                     if (addingNewIngredientToDishHashSet.add(parent.getItemAtPosition(position).toString())) {
-                        choosenIngredients.add(ingredientArrayList.get(position-1));
+                        choosenIngredients.add(ingredientArrayList.get(position - 1));
                         IngredientsRecyclerAdapter ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), choosenIngredients);
                         fragmentAddNewMealBinding.ingredientsRv.setAdapter(ingredientsRecyclerAdapter);
                     } else {
