@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.github.ybq.android.spinkit.sprite.Sprite;
 import com.github.ybq.android.spinkit.style.FadingCircle;
 import com.google.android.flexbox.FlexDirection;
@@ -24,6 +25,7 @@ import com.jaszczurowskip.cookbook.features.IngredientsRecyclerAdapter;
 import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -70,6 +72,10 @@ public class MealDetailsFragment extends Fragment {
     private void initView() {
         progressBar = new FadingCircle();
         fragmentMealDetailsBinding.progressBar.setIndeterminateDrawable(progressBar);
+        FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
+        layoutManager.setFlexDirection(FlexDirection.ROW);
+        layoutManager.setJustifyContent(JustifyContent.FLEX_START);
+        fragmentMealDetailsBinding.recyclerView.setLayoutManager(layoutManager);
         fetchDataFromRemote();
     }
 
@@ -82,6 +88,7 @@ public class MealDetailsFragment extends Fragment {
         apiService.getDish(dishId)
                 .subscribeOn(AppSchedulersProvider.getInstance().io())
                 .observeOn(AppSchedulersProvider.getInstance().ui())
+                .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
                 .subscribe(new Observer<DishesApiModel>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -107,15 +114,13 @@ public class MealDetailsFragment extends Fragment {
     }
 
     private void displayData(DishesApiModel dishesApiModel) {
-        FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
-        layoutManager.setFlexDirection(FlexDirection.ROW);
-        layoutManager.setJustifyContent(JustifyContent.FLEX_START);
-        fragmentMealDetailsBinding.recyclerView.setLayoutManager(layoutManager);
         ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), dishesApiModel.getIngredients());
         fragmentMealDetailsBinding.recyclerView.setAdapter(ingredientsRecyclerAdapter);
         fragmentMealDetailsBinding.mealNameTv.setText(dishesApiModel.getName());
         fragmentMealDetailsBinding.mealDescriptionTv.setText(dishesApiModel.getRecipe());
-        Glide.with(getContext()).load(dishesApiModel.getPicture()).into(fragmentMealDetailsBinding.mealImg);
+        RequestOptions requestOptions = new RequestOptions();
+        requestOptions.centerCrop();
+        Glide.with(getContext()).load(dishesApiModel.getPicture()).apply(requestOptions).into(fragmentMealDetailsBinding.mealImg);
     }
 
     @Override
