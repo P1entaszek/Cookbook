@@ -58,6 +58,8 @@ public class AddNewMealFragment extends Fragment {
     private ArrayList<IngredientApiModel> ingredientArrayList = new ArrayList<>();
     private ArrayList<IngredientApiModel> choosenIngredients = new ArrayList<>();
     private Bitmap selectedImage;
+    private IngredientsRecyclerAdapter ingredientsRecyclerAdapter;
+    private ArrayAdapter<String> spinnerAdapter;
 
 
     public AddNewMealFragment() {
@@ -134,6 +136,7 @@ public class AddNewMealFragment extends Fragment {
                             @Override
                             public void onComplete() {
                                 Toast.makeText(getContext(), R.string.dish_added, Toast.LENGTH_LONG).show();
+                                clearForm();
                             }
                         });
             }
@@ -189,8 +192,8 @@ public class AddNewMealFragment extends Fragment {
                             listSpinnerItems.add(ingredientApiModels.get(i).getName());
                             ingredientArrayList.add(ingredientApiModels.get(i));
                         }
-                        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, listSpinnerItems);
-                        fragmentAddNewMealBinding.ingredientsSpinner.setAdapter(arrayAdapter);
+                        spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, listSpinnerItems);
+                        fragmentAddNewMealBinding.ingredientsSpinner.setAdapter(spinnerAdapter);
                     }
 
                     @Override
@@ -204,6 +207,17 @@ public class AddNewMealFragment extends Fragment {
                         //no-op
                     }
                 });
+    }
+
+    private void clearForm() {
+        choosenIngredients.clear();
+        choosenIngredients.clear();
+        ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), choosenIngredients);
+        fragmentAddNewMealBinding.ingredientsRv.setAdapter(ingredientsRecyclerAdapter);
+        fragmentAddNewMealBinding.mealDescriptionTv.setText("");
+        fragmentAddNewMealBinding.mealNameEt.setText("");
+        fragmentAddNewMealBinding.mealNameImg.setImageDrawable(getResources().getDrawable(R.color.colorPrimary));
+        fragmentAddNewMealBinding.ingredientsSpinner.setAdapter(spinnerAdapter);
     }
 
     private void addNewIngredientToSpinner() {
@@ -257,7 +271,7 @@ public class AddNewMealFragment extends Fragment {
                 if (!parent.getItemAtPosition(position).toString().equals("Choose some ingredients")) {
                     if (addingNewIngredientToDishHashSet.add(parent.getItemAtPosition(position).toString())) {
                         choosenIngredients.add(ingredientArrayList.get(position - 1));
-                        IngredientsRecyclerAdapter ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), choosenIngredients);
+                        ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), choosenIngredients);
                         fragmentAddNewMealBinding.ingredientsRv.setAdapter(ingredientsRecyclerAdapter);
                     } else {
                         Toast.makeText(getContext(), "Element is in dish", Toast.LENGTH_LONG).show();

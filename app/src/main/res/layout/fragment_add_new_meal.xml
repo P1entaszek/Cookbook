@@ -22,7 +22,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/meal_name_img"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/meal_name_img"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/meal_name_img"
@@ -30,7 +30,7 @@
             android:layout_height="90dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:src="@android:color/holo_green_light"
+            android:src="@color/colorPrimary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -67,10 +67,10 @@
             app:layout_constraintTop_toBottomOf="@+id/ingredients_spinner">
 
             <android.support.v7.widget.RecyclerView
-                android:orientation="vertical"
                 android:id="@+id/ingredients_rv"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:orientation="vertical" />
         </FrameLayout>
 
         <ScrollView
@@ -89,7 +89,7 @@
                 android:id="@+id/meal_description_tv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Describe recipe of the dish"/>
+                android:hint="Describe recipe of the dish" />
         </ScrollView>
 
         <Button
