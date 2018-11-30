@@ -3,8 +3,11 @@ package com.jaszczurowskip.cookbook.features.mealslist;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +17,7 @@ import com.github.ybq.android.spinkit.sprite.Sprite;
 import com.github.ybq.android.spinkit.style.FadingCircle;
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.databinding.FragmentMealsListBinding;
+import com.jaszczurowskip.cookbook.datasource.model.DishModelToPost;
 import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
 import com.jaszczurowskip.cookbook.datasource.retrofit.ApiService;
 import com.jaszczurowskip.cookbook.datasource.retrofit.RetrofitClient;
@@ -26,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DefaultObserver;
 import retrofit2.Retrofit;
 
 /**
@@ -36,6 +41,7 @@ public class MealsListFragment extends Fragment {
     private Retrofit retrofit;
     private ApiService apiService;
     private Sprite progressBar;
+    private List<DishesApiModel> dishesList;
 
     public MealsListFragment() {
         // Required empty public constructor
@@ -60,16 +66,57 @@ public class MealsListFragment extends Fragment {
     private void initView() {
         progressBar = new FadingCircle();
         fragmentMealsListBinding.progressBar.setIndeterminateDrawable(progressBar);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(createHelperCallback());
+        itemTouchHelper.attachToRecyclerView(fragmentMealsListBinding.mealsListRecycler);
         fetchDataFromRemote();
     }
 
-    private void setListeners() {
-        fragmentMealsListBinding.addNewMealFab.setOnClickListener(new View.OnClickListener() {
+    private ItemTouchHelper.Callback createHelperCallback() {
+        return new ItemTouchHelper.SimpleCallback(0,
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+
             @Override
-            public void onClick(View v) {
-                Utils.startAnotherActivity(getContext(), AddNewMealActivity.class);
+            public boolean onMove(@NonNull RecyclerView recyclerView1, @NonNull RecyclerView.ViewHolder viewHolder,
+                                  @NonNull RecyclerView.ViewHolder target) {
+                return false;
             }
-        });
+
+            @Override
+            public void onSwiped(@NonNull final RecyclerView.ViewHolder viewHolder, @NonNull int swipeDir) {
+                final int position = viewHolder.getAdapterPosition();
+                deleteDish(position);
+                dishesList.clear();
+                fetchDataFromRemote();
+            }
+        };
+    }
+
+    private void deleteDish(int position) {
+        apiService.deleteDish(dishesList.get(position).getId())
+                .subscribeOn(AppSchedulersProvider.getInstance().io())
+                .observeOn(AppSchedulersProvider.getInstance().ui())
+                .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
+                .subscribe(new DefaultObserver<DishModelToPost>() {
+                    @Override
+                    public void onNext(DishModelToPost dishModelToPost) {
+                        //no-op
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(getContext(), "Can't delete dish", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Toast.makeText(getContext(), "Dish deleted", Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+
+    private void setListeners() {
+        fragmentMealsListBinding.addNewMealFab.setOnClickListener(v -> Utils.startAnotherActivity(getContext(), AddNewMealActivity.class));
     }
 
     private void fetchDataFromRemote() {
@@ -106,7 +153,8 @@ public class MealsListFragment extends Fragment {
         LinearLayoutManager layoutManager;
         layoutManager = new LinearLayoutManager(getActivity());
         fragmentMealsListBinding.mealsListRecycler.setLayoutManager(layoutManager);
-        adapter = new ListAdapter(getContext(), dishes);
+        dishesList = dishes;
+        adapter = new ListAdapter(getContext(), dishesList);
         fragmentMealsListBinding.mealsListRecycler.setAdapter(adapter);
     }
 
