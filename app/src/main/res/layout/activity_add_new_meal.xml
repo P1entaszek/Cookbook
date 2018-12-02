@@ -4,4 +4,5 @@
     android:id="@+id/root_activity_add_meal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#2b2e39"
     tools:context=".features.addnewmeal.AddNewMealActivity" />

@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.ybq.android.spinkit.sprite.Sprite;
 import com.github.ybq.android.spinkit.style.FadingCircle;
@@ -120,7 +122,8 @@ public class MealDetailsFragment extends Fragment {
         fragmentMealDetailsBinding.mealDescriptionTv.setText(dishesApiModel.getRecipe());
         RequestOptions requestOptions = new RequestOptions();
         requestOptions.centerCrop();
-        Glide.with(getContext()).load(dishesApiModel.getPicture()).apply(requestOptions).into(fragmentMealDetailsBinding.mealImg);
+        Glide.with(getContext())
+                .load(dishesApiModel.getPicture()).apply(new RequestOptions().transforms(new CenterCrop(), new RoundedCorners(45))).into(fragmentMealDetailsBinding.mealImg);
     }
 
     @Override

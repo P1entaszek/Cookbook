@@ -10,5 +10,5 @@
         android:layout_margin="5dp"
         android:background="@drawable/ingredient_container_style"
         android:padding="10dp"
-        android:textColor="#050505" />
+        android:textColor="#ffffff" />
 </LinearLayout>
