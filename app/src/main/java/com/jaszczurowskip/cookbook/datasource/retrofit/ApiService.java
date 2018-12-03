@@ -12,6 +12,7 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * Created by jaszczurowskip on 21.11.2018
@@ -26,6 +27,9 @@ public interface ApiService {
 
     @GET("dishes/{dishId}")
     Observable<DishesApiModel> getDish(@Path("dishId") long dishID);
+
+    @GET("dishes?")
+    Observable<List<DishesApiModel>> getSearchedDishes(@Query("term") String term);
 
     @POST("ingredients")
     Observable<String> postIngredient(@Body String string);
