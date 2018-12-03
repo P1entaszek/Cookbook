@@ -32,8 +32,7 @@ public class CookbookClient {
 
     private ApiService getApiService() {
         Retrofit retrofit = RetrofitClient.getRetrofitInstance();
-        ApiService apiService = retrofit.create(ApiService.class);
-        return apiService;
+        return retrofit.create(ApiService.class);
     }
 
     private void castErrorToHTTP(final Throwable e, final ServerResponseListener<?> listener) {
@@ -61,7 +60,7 @@ public class CookbookClient {
 
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        //no-op
                     }
 
                     @Override
@@ -76,7 +75,7 @@ public class CookbookClient {
 
                     @Override
                     public void onComplete() {
-
+                        //no-op
                     }
                 });
     }
@@ -89,7 +88,7 @@ public class CookbookClient {
                 .subscribe(new Observer<List<DishesApiModel>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        //no-op
                     }
 
                     @Override
@@ -104,7 +103,7 @@ public class CookbookClient {
 
                     @Override
                     public void onComplete() {
-
+                        //no-op
                     }
                 });
     }
@@ -127,8 +126,37 @@ public class CookbookClient {
 
                     @Override
                     public void onComplete() {
-
+                        //no-op
                     }
                 });
     }
+
+    public void getDish(long dishID, final ServerResponseListener<DishesApiModel> listener) {
+        getApiService().getDish(dishID)
+                .subscribeOn(AppSchedulersProvider.getInstance().io())
+                .observeOn(AppSchedulersProvider.getInstance().ui())
+                .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
+                .subscribe(new Observer<DishesApiModel>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        //no-op
+                    }
+
+                    @Override
+                    public void onNext(DishesApiModel dish) {
+                        listener.onSuccess(dish);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        castErrorToHTTP(e, listener);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        //no-op
+                    }
+                });
+    }
+
 }
