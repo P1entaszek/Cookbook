@@ -12,4 +12,6 @@
     <string name="name_the_meal">Name the meal</string>
     <string name="choose_some_ingredients">Choose some ingredients</string>
     <string name="dish_added">Dish added</string>
+    <string name="cant_delete_dish">Can\'t delete dish</string>
+    <string name="dish_deleted">Dish deleted</string>
 </resources>
