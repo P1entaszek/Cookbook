@@ -9,19 +9,6 @@
     android:layout_height="match_parent"
     tools:context=".features.mealslist.MealsListFragment">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="CookBook"
-        app:layout_constraintBottom_toTopOf="@+id/search_ingredients_bar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <EditText
         android:id="@+id/search_ingredients_bar"
         android:layout_width="0dp"
@@ -35,7 +22,7 @@
         android:background="@drawable/ingredient_container_style_white"
         android:textColor="@android:color/black"
         android:textColorHint="@android:color/black"
-        app:layout_constraintStart_toEndOf="@id/title"
+        app:layout_constraintStart_toEndOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
