@@ -1,7 +1,5 @@
 package com.jaszczurowskip.cookbook.datasource;
 
-import android.widget.Toast;
-
 import com.google.gson.Gson;
 import com.jaszczurowskip.cookbook.datasource.model.ApiError;
 import com.jaszczurowskip.cookbook.datasource.model.DishModelToPost;
@@ -25,14 +23,14 @@ import retrofit2.Retrofit;
 public class CookbookClient {
     private static CookbookClient cookbookClient;
 
-    public static CookbookClient getCookbookClient(){
-        if(cookbookClient ==null){
-            cookbookClient =new CookbookClient();
+    public static CookbookClient getCookbookClient() {
+        if (cookbookClient == null) {
+            cookbookClient = new CookbookClient();
         }
         return cookbookClient;
     }
 
-    private ApiService getApiService(){
+    private ApiService getApiService() {
         Retrofit retrofit = RetrofitClient.getRetrofitInstance();
         ApiService apiService = retrofit.create(ApiService.class);
         return apiService;
@@ -53,13 +51,13 @@ public class CookbookClient {
         e.printStackTrace();
     }
 
-    public void getAllDishes(final ServerResponseListener<List<DishesApiModel>> listener){
+    public void getAllDishes(final ServerResponseListener<List<DishesApiModel>> listener) {
         getApiService()
                 .getAllDishes()
                 .subscribeOn(AppSchedulersProvider.getInstance().io())
                 .observeOn(AppSchedulersProvider.getInstance().ui())
                 .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
-                .subscribe(new Observer<List<DishesApiModel>>(){
+                .subscribe(new Observer<List<DishesApiModel>>() {
 
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -73,7 +71,7 @@ public class CookbookClient {
 
                     @Override
                     public void onError(Throwable e) {
-                            castErrorToHTTP(e, listener);
+                        castErrorToHTTP(e, listener);
                     }
 
                     @Override
@@ -83,35 +81,35 @@ public class CookbookClient {
                 });
     }
 
-public  void getSearchedDishes (final CharSequence searchingParameter, final ServerResponseListener<List<DishesApiModel>> listener ){
-    getApiService().getSearchedDishes(String.valueOf(searchingParameter))
-            .subscribeOn(AppSchedulersProvider.getInstance().io())
-            .observeOn(AppSchedulersProvider.getInstance().ui())
-            .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
-            .subscribe(new Observer<List<DishesApiModel>>() {
-                @Override
-                public void onSubscribe(Disposable d) {
+    public void getSearchedDishes(final CharSequence searchingParameter, final ServerResponseListener<List<DishesApiModel>> listener) {
+        getApiService().getSearchedDishes(String.valueOf(searchingParameter))
+                .subscribeOn(AppSchedulersProvider.getInstance().io())
+                .observeOn(AppSchedulersProvider.getInstance().ui())
+                .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
+                .subscribe(new Observer<List<DishesApiModel>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
 
-                }
+                    }
 
-                @Override
-                public void onNext(List<DishesApiModel> list) {
-                    listener.onSuccess(list);
-                }
+                    @Override
+                    public void onNext(List<DishesApiModel> list) {
+                        listener.onSuccess(list);
+                    }
 
-                @Override
-                public void onError(Throwable e) {
-                    castErrorToHTTP(e, listener);
-                }
+                    @Override
+                    public void onError(Throwable e) {
+                        castErrorToHTTP(e, listener);
+                    }
 
-                @Override
-                public void onComplete() {
+                    @Override
+                    public void onComplete() {
 
-                }
-            });
+                    }
+                });
     }
 
-    public void deleteDish(int selectedDish, List<DishesApiModel> list, final ServerResponseListener<List<DishesApiModel>> listener){
+    public void deleteDish(int selectedDish, List<DishesApiModel> list, final ServerResponseListener<List<DishesApiModel>> listener) {
         getApiService().deleteDish(list.get(selectedDish).getId())
                 .subscribeOn(AppSchedulersProvider.getInstance().io())
                 .observeOn(AppSchedulersProvider.getInstance().ui())

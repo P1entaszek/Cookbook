@@ -1,7 +1,5 @@
 package com.jaszczurowskip.cookbook.datasource;
 
-import android.support.annotation.RequiresPermission;
-
 import com.jaszczurowskip.cookbook.datasource.model.ApiError;
 
 /**
@@ -10,5 +8,6 @@ import com.jaszczurowskip.cookbook.datasource.model.ApiError;
 public interface ServerResponseListener<T> {
 
     void onSuccess(T response);
+
     void onError(ApiError error);
 }

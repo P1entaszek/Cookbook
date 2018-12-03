@@ -13,6 +13,14 @@ public class ApiError {
     private String message;
     private String path;
 
+    public static ApiError getServerConnectionError(String msg) {
+        ApiError error = new ApiError();
+        error.status = 500;
+        error.message = msg;
+        return error;
+
+    }
+
     public long getTimestamp() {
         return timestamp;
     }
@@ -35,13 +43,5 @@ public class ApiError {
 
     public String getPath() {
         return path;
-    }
-
-    public static ApiError getServerConnectionError(String msg){
-        ApiError error = new ApiError();
-        error.status = 500;
-        error.message = msg;
-        return error;
-
     }
 }

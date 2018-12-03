@@ -23,20 +23,13 @@ import com.jaszczurowskip.cookbook.databinding.FragmentMealsListBinding;
 import com.jaszczurowskip.cookbook.datasource.CookbookClient;
 import com.jaszczurowskip.cookbook.datasource.ServerResponseListener;
 import com.jaszczurowskip.cookbook.datasource.model.ApiError;
-import com.jaszczurowskip.cookbook.datasource.model.DishModelToPost;
 import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
 import com.jaszczurowskip.cookbook.datasource.retrofit.ApiService;
-import com.jaszczurowskip.cookbook.datasource.retrofit.RetrofitClient;
 import com.jaszczurowskip.cookbook.features.addnewmeal.AddNewMealActivity;
 import com.jaszczurowskip.cookbook.utils.Utils;
-import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.observers.DefaultObserver;
 import retrofit2.Retrofit;
 
 /**
