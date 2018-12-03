@@ -211,7 +211,6 @@ public class AddNewMealFragment extends Fragment {
 
     private void clearForm() {
         choosenIngredients.clear();
-        choosenIngredients.clear();
         ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), choosenIngredients);
         fragmentAddNewMealBinding.ingredientsRv.setAdapter(ingredientsRecyclerAdapter);
         fragmentAddNewMealBinding.mealDescriptionTv.setText("");

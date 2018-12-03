@@ -119,8 +119,7 @@ public class MealDetailsFragment extends Fragment {
         fragmentMealDetailsBinding.mealNameTv.setText(dishesApiModel.getName());
         fragmentMealDetailsBinding.mealDescriptionTv.setText(dishesApiModel.getRecipe());
         RequestOptions requestOptions = new RequestOptions();
-        requestOptions.centerCrop();
-        Glide.with(getContext()).load(dishesApiModel.getPicture()).apply(requestOptions).into(fragmentMealDetailsBinding.mealImg);
+        Glide.with(getContext()).load(dishesApiModel.getPicture()).apply(requestOptions.centerCrop()).into(fragmentMealDetailsBinding.mealImg);
     }
 
     @Override
