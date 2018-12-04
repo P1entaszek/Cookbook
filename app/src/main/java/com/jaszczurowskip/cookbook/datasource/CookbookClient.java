@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.jaszczurowskip.cookbook.datasource.model.ApiError;
 import com.jaszczurowskip.cookbook.datasource.model.DishModelToPost;
 import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
+import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
 import com.jaszczurowskip.cookbook.datasource.retrofit.ApiService;
 import com.jaszczurowskip.cookbook.datasource.retrofit.RetrofitClient;
 import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
@@ -108,7 +109,7 @@ public class CookbookClient {
                 });
     }
 
-    public void deleteDish(int selectedDish, List<DishesApiModel> list, final ServerResponseListener<List<DishesApiModel>> listener) {
+    public void deleteDish(final int selectedDish, List<DishesApiModel> list, final ServerResponseListener<List<DishesApiModel>> listener) {
         getApiService().deleteDish(list.get(selectedDish).getId())
                 .subscribeOn(AppSchedulersProvider.getInstance().io())
                 .observeOn(AppSchedulersProvider.getInstance().ui())
@@ -131,7 +132,7 @@ public class CookbookClient {
                 });
     }
 
-    public void getDish(long dishID, final ServerResponseListener<DishesApiModel> listener) {
+    public void getDish(final long dishID, final ServerResponseListener<DishesApiModel> listener) {
         getApiService().getDish(dishID)
                 .subscribeOn(AppSchedulersProvider.getInstance().io())
                 .observeOn(AppSchedulersProvider.getInstance().ui())
@@ -145,6 +146,89 @@ public class CookbookClient {
                     @Override
                     public void onNext(DishesApiModel dish) {
                         listener.onSuccess(dish);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        castErrorToHTTP(e, listener);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        //no-op
+                    }
+                });
+    }
+
+    public void sendDishToServer(final DishModelToPost dishModelToPost, final ServerResponseListener<DishModelToPost> listener) {
+        getApiService().postDish(dishModelToPost)
+                .subscribeOn(AppSchedulersProvider.getInstance().io())
+                .observeOn(AppSchedulersProvider.getInstance().ui())
+                .retryWhen(throwables -> throwables.delay(1, TimeUnit.MICROSECONDS))
+                .subscribe(new Observer<DishModelToPost>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        //no-op
+                    }
+
+                    @Override
+                    public void onNext(DishModelToPost dish) {
+                        listener.onSuccess(dish);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        castErrorToHTTP(e, listener);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        //no-op
+                    }
+                });
+    }
+
+    public void getAllIngredients(final ServerResponseListener<List<IngredientApiModel>> listener) {
+        getApiService().getAllIngredients()
+                .subscribeOn(AppSchedulersProvider.getInstance().io())
+                .observeOn(AppSchedulersProvider.getInstance().ui())
+                .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
+                .subscribe(new Observer<List<IngredientApiModel>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<IngredientApiModel> allIngredients) {
+                        listener.onSuccess(allIngredients);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        castErrorToHTTP(e, listener);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        //no-op
+                    }
+                });
+    }
+
+    public void sendIngredientToServer(final String ingredient, final ServerResponseListener<String> listener) {
+        getApiService().postIngredient(ingredient)
+                .subscribeOn(AppSchedulersProvider.getInstance().io())
+                .observeOn(AppSchedulersProvider.getInstance().ui())
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        //no-op
+                    }
+
+                    @Override
+                    public void onNext(String s) {
+                        listener.onSuccess(s);
                     }
 
                     @Override

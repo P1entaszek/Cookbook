@@ -143,7 +143,7 @@ public class MealsListFragment extends Fragment {
             public void onError(ApiError error) {
                 Log.d(MEALS_LIST_FRAGMENT, error.getMessage());
                 fragmentMealsListBinding.progressBar.setVisibility(View.INVISIBLE);
-                Toast.makeText(getContext(), R.string.Please_check_your_internet_connection, Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), R.string.please_check_your_internet_connection, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -153,7 +153,7 @@ public class MealsListFragment extends Fragment {
             @Override
             public void onSuccess(List<DishesApiModel> list) {
                 dishesList = list;
-                displayData(list);
+                displayData(dishesList);
                 fragmentMealsListBinding.progressBar.setVisibility(View.INVISIBLE);
             }
 
@@ -161,7 +161,7 @@ public class MealsListFragment extends Fragment {
             public void onError(ApiError error) {
                 Log.d(MEALS_LIST_FRAGMENT, error.getMessage());
                 fragmentMealsListBinding.progressBar.setVisibility(View.INVISIBLE);
-                Toast.makeText(getContext(), R.string.Please_check_your_internet_connection, Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), R.string.please_check_your_internet_connection, Toast.LENGTH_LONG).show();
             }
         });
     }

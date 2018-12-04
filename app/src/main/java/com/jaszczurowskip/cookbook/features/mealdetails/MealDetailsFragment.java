@@ -86,7 +86,7 @@ public class MealDetailsFragment extends Fragment {
             public void onError(ApiError error) {
                 Log.d(MEAL_DETAILS_FRAGMENT, error.getMessage());
                 fragmentMealDetailsBinding.progressBar.setVisibility(View.INVISIBLE);
-                Toast.makeText(getContext(), R.string.Please_check_your_internet_connection, Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), R.string.please_check_your_internet_connection, Toast.LENGTH_LONG).show();
             }
         });
     }
