@@ -13,15 +13,21 @@
         android:id="@+id/search_ingredients_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:ems="10"
         android:hint="@string/type_some_ingredients"
+        android:inputType=""
+        android:padding="10dp"
+        android:background="@drawable/ingredient_container_style_white"
+        android:textColor="@android:color/black"
+        android:textColorHint="@android:color/black"
+        app:layout_constraintStart_toEndOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteY="16dp"
-        android:inputType="" />
+        tools:layout_editor_absoluteY="41dp" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/add_new_meal_fab"
@@ -30,8 +36,8 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:clickable="true"
-        android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="@color/colorPrimary"
+        android:src="@drawable/white_plus"
+        app:backgroundTint="@android:color/holo_red_dark"
         app:layout_constraintBottom_toBottomOf="@+id/meals_list_recycler"
         app:layout_constraintEnd_toEndOf="@+id/meals_list_recycler"
         android:focusable="true" />

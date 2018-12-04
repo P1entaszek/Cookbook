@@ -28,6 +28,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:textSize="20sp"
+            android:textColor="@android:color/white"
             android:gravity="center"
             app:layout_constraintBottom_toBottomOf="@+id/meal_img"
             app:layout_constraintEnd_toEndOf="@+id/meal_img"
@@ -72,7 +73,9 @@
             <TextView
                 android:id="@+id/meal_description_tv"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:padding="10dp"
+                android:textColor="@android:color/white" />
         </android.support.v4.widget.NestedScrollView>
 
         <com.github.ybq.android.spinkit.SpinKitView
