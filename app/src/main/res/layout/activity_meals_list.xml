@@ -4,5 +4,5 @@
     android:id="@+id/root_activity_meals_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2b2e39"
+    android:background="@color/colorBackground"
     tools:context=".features.mealslist.MealsListActivity" />
