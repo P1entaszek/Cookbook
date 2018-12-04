@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,20 +20,16 @@ import com.github.ybq.android.spinkit.sprite.Sprite;
 import com.github.ybq.android.spinkit.style.FadingCircle;
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.databinding.FragmentMealsListBinding;
-import com.jaszczurowskip.cookbook.datasource.model.DishModelToPost;
+import com.jaszczurowskip.cookbook.datasource.CookbookClient;
+import com.jaszczurowskip.cookbook.datasource.ServerResponseListener;
+import com.jaszczurowskip.cookbook.datasource.model.ApiError;
 import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
 import com.jaszczurowskip.cookbook.datasource.retrofit.ApiService;
-import com.jaszczurowskip.cookbook.datasource.retrofit.RetrofitClient;
 import com.jaszczurowskip.cookbook.features.addnewmeal.AddNewMealActivity;
 import com.jaszczurowskip.cookbook.utils.Utils;
-import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.observers.DefaultObserver;
 import retrofit2.Retrofit;
 
 /**
@@ -40,6 +37,7 @@ import retrofit2.Retrofit;
  */
 public class MealsListFragment extends Fragment {
     private FragmentMealsListBinding fragmentMealsListBinding;
+    private String MEALS_LIST_FRAGMENT = MealsListFragment.class.getSimpleName();
     private Retrofit retrofit;
     private ApiService apiService;
     private Sprite progressBar;
@@ -55,14 +53,8 @@ public class MealsListFragment extends Fragment {
 
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        initRetrofit();
         initView();
         setListeners();
-    }
-
-    private void initRetrofit() {
-        retrofit = RetrofitClient.getRetrofitInstance();
-        apiService = retrofit.create(ApiService.class);
     }
 
     private void initView() {
@@ -94,26 +86,18 @@ public class MealsListFragment extends Fragment {
     }
 
     private void deleteDish(int position) {
-        apiService.deleteDish(dishesList.get(position).getId())
-                .subscribeOn(AppSchedulersProvider.getInstance().io())
-                .observeOn(AppSchedulersProvider.getInstance().ui())
-                .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
-                .subscribe(new DefaultObserver<DishModelToPost>() {
-                    @Override
-                    public void onNext(DishModelToPost dishModelToPost) {
-                        //no-op
-                    }
+        CookbookClient.getCookbookClient().deleteDish(position, dishesList, new ServerResponseListener<List<DishesApiModel>>() {
+            @Override
+            public void onSuccess(List<DishesApiModel> response) {
+                Toast.makeText(getContext(), R.string.dish_deleted, Toast.LENGTH_LONG).show();
+            }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Toast.makeText(getContext(), "Can't delete dish", Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        Toast.makeText(getContext(), "Dish deleted", Toast.LENGTH_LONG).show();
-                    }
-                });
+            @Override
+            public void onError(ApiError error) {
+                Log.d(MEALS_LIST_FRAGMENT, error.getMessage());
+                Toast.makeText(getContext(), R.string.cant_delete_dish, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
 
@@ -146,61 +130,40 @@ public class MealsListFragment extends Fragment {
     }
 
     private void getSearchedDishesList(CharSequence searchingParameter) {
-        apiService.getSearchedDishes(String.valueOf(searchingParameter))
-                .subscribeOn(AppSchedulersProvider.getInstance().io())
-                .observeOn(AppSchedulersProvider.getInstance().ui())
-                .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
-                .subscribe(new Observer<List<DishesApiModel>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
+        fragmentMealsListBinding.progressBar.setVisibility(View.VISIBLE);
+        CookbookClient.getCookbookClient().getSearchedDishes(searchingParameter, new ServerResponseListener<List<DishesApiModel>>() {
+            @Override
+            public void onSuccess(List<DishesApiModel> list) {
+                dishesList = list;
+                displayData(dishesList);
+                fragmentMealsListBinding.progressBar.setVisibility(View.INVISIBLE);
+            }
 
-                    }
-
-                    @Override
-                    public void onNext(List<DishesApiModel> list) {
-                        displayData(list);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                        Toast.makeText(getContext(), R.string.Please_check_your_internet_connection, Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
+            @Override
+            public void onError(ApiError error) {
+                Log.d(MEALS_LIST_FRAGMENT, error.getMessage());
+                fragmentMealsListBinding.progressBar.setVisibility(View.INVISIBLE);
+                Toast.makeText(getContext(), R.string.please_check_your_internet_connection, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void fetchDataFromRemote() {
-        apiService.getAllDishes()
-                .subscribeOn(AppSchedulersProvider.getInstance().io())
-                .observeOn(AppSchedulersProvider.getInstance().ui())
-                .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
-                .subscribe(new Observer<List<DishesApiModel>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        //no-op
-                    }
+        CookbookClient.getCookbookClient().getAllDishes(new ServerResponseListener<List<DishesApiModel>>() {
+            @Override
+            public void onSuccess(List<DishesApiModel> list) {
+                dishesList = list;
+                displayData(dishesList);
+                fragmentMealsListBinding.progressBar.setVisibility(View.INVISIBLE);
+            }
 
-                    @Override
-                    public void onNext(List<DishesApiModel> list) {
-                        displayData(list);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                        Toast.makeText(getContext(), R.string.Please_check_your_internet_connection, Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        fragmentMealsListBinding.progressBar.setVisibility(View.INVISIBLE);
-                    }
-                });
+            @Override
+            public void onError(ApiError error) {
+                Log.d(MEALS_LIST_FRAGMENT, error.getMessage());
+                fragmentMealsListBinding.progressBar.setVisibility(View.INVISIBLE);
+                Toast.makeText(getContext(), R.string.please_check_your_internet_connection, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void displayData(List<DishesApiModel> dishes) {
@@ -208,8 +171,7 @@ public class MealsListFragment extends Fragment {
         LinearLayoutManager layoutManager;
         layoutManager = new LinearLayoutManager(getActivity());
         fragmentMealsListBinding.mealsListRecycler.setLayoutManager(layoutManager);
-        dishesList = dishes;
-        adapter = new ListAdapter(getContext(), dishesList);
+        adapter = new ListAdapter(getContext(), dishes);
         fragmentMealsListBinding.mealsListRecycler.setAdapter(adapter);
     }
 
