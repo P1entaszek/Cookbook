@@ -17,8 +17,7 @@
     <string name="server_is_not_responding">Server is not responding</string>
     <string name="ingredient_is_in_dish">Ingredient is in dish</string>
     <string name="error_when_uploading_files">Error when uploading files</string>
-    <string name="you_dont_choose_picture">You don\'t choose the picture</string>
-    <string name="wrong_filled_dish_form">Wrong filled dish form</string>
+    <string name="wrong_filled_dish_form">Wrong filled dish form.</string>
     <string name="dish_must_have_description">Dish must have description</string>
     <string name="dish_must_have_name">Dish must have name</string>
     <string name="you_didnt_choose_dish_ingredients">You didn\'t choose dish ingredients.</string>

@@ -105,7 +105,7 @@ public class AddNewMealFragment extends Fragment {
             generalToast = generalToast.concat(newLine).concat(getString(R.string.you_didnt_choose_dish_picture));
             valid = false;
         }
-        if (!valid) Toast.makeText(getContext(), generalToast, Toast.LENGTH_SHORT).show();
+        if (!valid) Toast.makeText(getContext(), generalToast, Toast.LENGTH_LONG).show();
         return valid;
     }
 
@@ -268,7 +268,7 @@ public class AddNewMealFragment extends Fragment {
             }
 
         } else {
-            Toast.makeText(getContext(), R.string.you_dont_choose_picture, Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), R.string.you_didnt_choose_dish_picture, Toast.LENGTH_LONG).show();
         }
     }
 
