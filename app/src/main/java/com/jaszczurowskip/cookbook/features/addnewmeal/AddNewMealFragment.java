@@ -84,22 +84,27 @@ public class AddNewMealFragment extends Fragment {
 
     public boolean validatePostNewDish(DishModelToPost dishModelToPost) {
         boolean valid = true;
+        String generalToast = getString(R.string.wrong_filled_dish_form);
+        String newLine = getString(R.string.new_line);
         if (dishModelToPost.getIngredientIds().isEmpty()) {
-            Toast.makeText(getContext(), R.string.wrong_filled_dish_form, Toast.LENGTH_LONG).show();
+            generalToast = generalToast.concat(newLine).concat(getString(R.string.you_didnt_choose_dish_ingredients));
             valid = false;
         }
         if (dishModelToPost.getName().isEmpty()) {
+            generalToast = generalToast.concat(newLine).concat(getString(R.string.dish_must_have_name));
             fragmentAddNewMealBinding.mealNameEt.setError(getString(R.string.dish_must_have_name));
             valid = false;
         }
         if (dishModelToPost.getRecipe().isEmpty()) {
+            generalToast = generalToast.concat(newLine).concat(getString(R.string.dish_must_have_description));
             fragmentAddNewMealBinding.mealDescriptionTv.setError(getString(R.string.dish_must_have_description));
             valid = false;
         }
         if (dishModelToPost.getPicture() == null) {
+            generalToast = generalToast.concat(newLine).concat(getString(R.string.you_didnt_choose_dish_picture));
             valid = false;
-            Toast.makeText(getContext(), R.string.wrong_filled_dish_form, Toast.LENGTH_LONG).show();
         }
+        if (!valid) Toast.makeText(getContext(), generalToast, Toast.LENGTH_SHORT).show();
         return valid;
     }
 
@@ -171,11 +176,12 @@ public class AddNewMealFragment extends Fragment {
 
     private void clearForm() {
         choosenIngredients.clear();
+        addingNewIngredientToDishHashSet.clear();
         ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), choosenIngredients);
         fragmentAddNewMealBinding.ingredientsRv.setAdapter(ingredientsRecyclerAdapter);
         fragmentAddNewMealBinding.mealDescriptionTv.setText("");
         fragmentAddNewMealBinding.mealNameEt.setText("");
-        fragmentAddNewMealBinding.mealNameImg.setImageDrawable(getResources().getDrawable(R.color.colorPrimary));
+        fragmentAddNewMealBinding.mealNameImg.setImageDrawable(getResources().getDrawable(R.drawable.select_photo));
         fragmentAddNewMealBinding.ingredientsSpinner.setAdapter(spinnerAdapter);
     }
 
