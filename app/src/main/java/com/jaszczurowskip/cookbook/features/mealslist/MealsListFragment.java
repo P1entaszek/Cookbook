@@ -24,13 +24,10 @@ import com.jaszczurowskip.cookbook.datasource.CookbookClient;
 import com.jaszczurowskip.cookbook.datasource.ServerResponseListener;
 import com.jaszczurowskip.cookbook.datasource.model.ApiError;
 import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
-import com.jaszczurowskip.cookbook.datasource.retrofit.ApiService;
 import com.jaszczurowskip.cookbook.features.addnewmeal.AddNewMealActivity;
 import com.jaszczurowskip.cookbook.utils.Utils;
 
 import java.util.List;
-
-import retrofit2.Retrofit;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -38,8 +35,6 @@ import retrofit2.Retrofit;
 public class MealsListFragment extends Fragment {
     private FragmentMealsListBinding fragmentMealsListBinding;
     private String MEALS_LIST_FRAGMENT = MealsListFragment.class.getSimpleName();
-    private Retrofit retrofit;
-    private ApiService apiService;
     private Sprite progressBar;
     private List<DishesApiModel> dishesList;
 
@@ -55,6 +50,15 @@ public class MealsListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         initView();
         setListeners();
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        recyclerLoadingVisibility(true);
+        fragmentMealsListBinding.searchIngredientsBar.setText("");
+        fetchDataFromRemote();
     }
 
     private void initView() {
@@ -100,6 +104,16 @@ public class MealsListFragment extends Fragment {
         });
     }
 
+    private void recyclerLoadingVisibility(boolean isRecyclerLoading) {
+        if (isRecyclerLoading) {
+            fragmentMealsListBinding.mealsListRecycler.setVisibility(View.INVISIBLE);
+            fragmentMealsListBinding.progressBar.setVisibility(View.VISIBLE);
+        }
+        if (!isRecyclerLoading) {
+            fragmentMealsListBinding.mealsListRecycler.setVisibility(View.VISIBLE);
+            fragmentMealsListBinding.progressBar.setVisibility(View.INVISIBLE);
+        }
+    }
 
     private void setListeners() {
         addNewMeal();
@@ -130,19 +144,19 @@ public class MealsListFragment extends Fragment {
     }
 
     private void getSearchedDishesList(CharSequence searchingParameter) {
-        fragmentMealsListBinding.progressBar.setVisibility(View.VISIBLE);
+        recyclerLoadingVisibility(true);
         CookbookClient.getCookbookClient().getSearchedDishes(searchingParameter, new ServerResponseListener<List<DishesApiModel>>() {
             @Override
             public void onSuccess(List<DishesApiModel> list) {
                 dishesList = list;
                 displayData(dishesList);
-                fragmentMealsListBinding.progressBar.setVisibility(View.INVISIBLE);
+                recyclerLoadingVisibility(false);
             }
 
             @Override
             public void onError(ApiError error) {
                 Log.d(MEALS_LIST_FRAGMENT, error.getMessage());
-                fragmentMealsListBinding.progressBar.setVisibility(View.INVISIBLE);
+                recyclerLoadingVisibility(false);
                 Toast.makeText(getContext(), R.string.please_check_your_internet_connection, Toast.LENGTH_LONG).show();
             }
         });
@@ -154,13 +168,13 @@ public class MealsListFragment extends Fragment {
             public void onSuccess(List<DishesApiModel> list) {
                 dishesList = list;
                 displayData(dishesList);
-                fragmentMealsListBinding.progressBar.setVisibility(View.INVISIBLE);
+                recyclerLoadingVisibility(false);
             }
 
             @Override
             public void onError(ApiError error) {
                 Log.d(MEALS_LIST_FRAGMENT, error.getMessage());
-                fragmentMealsListBinding.progressBar.setVisibility(View.INVISIBLE);
+                recyclerLoadingVisibility(false);
                 Toast.makeText(getContext(), R.string.please_check_your_internet_connection, Toast.LENGTH_LONG).show();
             }
         });

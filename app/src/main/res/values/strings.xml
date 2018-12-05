@@ -21,4 +21,7 @@
     <string name="wrong_filled_dish_form">Wrong filled dish form</string>
     <string name="dish_must_have_description">Dish must have description</string>
     <string name="dish_must_have_name">Dish must have name</string>
+    <string name="you_didnt_choose_dish_ingredients">You didn\'t choose dish ingredients.</string>
+    <string name="you_didnt_choose_dish_picture">You didn\'t choose dish picture.</string>
+    <string name="new_line">\n - </string>
 </resources>
