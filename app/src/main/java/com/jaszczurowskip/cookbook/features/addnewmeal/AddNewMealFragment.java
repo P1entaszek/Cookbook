@@ -30,6 +30,7 @@ import com.jaszczurowskip.cookbook.datasource.model.ApiError;
 import com.jaszczurowskip.cookbook.datasource.model.DishModelToPost;
 import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
 import com.jaszczurowskip.cookbook.features.IngredientsRecyclerAdapter;
+import com.jaszczurowskip.cookbook.features.mealslist.MealsListActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -116,6 +117,7 @@ public class AddNewMealFragment extends Fragment {
                     public void onSuccess(DishModelToPost response) {
                         Toast.makeText(getContext(), R.string.dish_added, Toast.LENGTH_LONG).show();
                         clearForm();
+                        startListActivity();
                     }
 
                     @Override
@@ -125,6 +127,11 @@ public class AddNewMealFragment extends Fragment {
                 });
             }
         });
+    }
+
+    private void startListActivity() {
+        Intent i = new Intent(getContext(), MealsListActivity.class);
+        getContext().startActivity(i);
     }
 
     private DishModelToPost preparedNewDishToPost() {

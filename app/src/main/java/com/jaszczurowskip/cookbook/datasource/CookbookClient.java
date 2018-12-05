@@ -12,8 +12,10 @@ import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.observers.DefaultObserver;
 import retrofit2.HttpException;
 import retrofit2.Retrofit;
@@ -22,6 +24,7 @@ import retrofit2.Retrofit;
  * Created by jaszczurowskip on 03.12.2018
  */
 public class CookbookClient {
+    private static int RETRIES_LIMIT = 5;
     private static CookbookClient cookbookClient;
 
     public static CookbookClient getCookbookClient() {
@@ -54,9 +57,9 @@ public class CookbookClient {
     public void getAllDishes(final ServerResponseListener<List<DishesApiModel>> listener) {
         getApiService()
                 .getAllDishes()
+                .retryWhen(new RetryWithDelay(RETRIES_LIMIT, 1))
                 .subscribeOn(AppSchedulersProvider.getInstance().io())
                 .observeOn(AppSchedulersProvider.getInstance().ui())
-                .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
                 .subscribe(new Observer<List<DishesApiModel>>() {
 
                     @Override
@@ -83,9 +86,9 @@ public class CookbookClient {
 
     public void getSearchedDishes(final CharSequence searchingParameter, final ServerResponseListener<List<DishesApiModel>> listener) {
         getApiService().getSearchedDishes(String.valueOf(searchingParameter))
+                .retryWhen(new RetryWithDelay(RETRIES_LIMIT, 1))
                 .subscribeOn(AppSchedulersProvider.getInstance().io())
                 .observeOn(AppSchedulersProvider.getInstance().ui())
-                .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
                 .subscribe(new Observer<List<DishesApiModel>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -111,9 +114,9 @@ public class CookbookClient {
 
     public void deleteDish(final int selectedDish, List<DishesApiModel> list, final ServerResponseListener<List<DishesApiModel>> listener) {
         getApiService().deleteDish(list.get(selectedDish).getId())
+                .retryWhen(new RetryWithDelay(RETRIES_LIMIT, 1))
                 .subscribeOn(AppSchedulersProvider.getInstance().io())
                 .observeOn(AppSchedulersProvider.getInstance().ui())
-                .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
                 .subscribe(new DefaultObserver<DishModelToPost>() {
                     @Override
                     public void onNext(DishModelToPost dishModelToPost) {
@@ -134,9 +137,9 @@ public class CookbookClient {
 
     public void getDish(final long dishID, final ServerResponseListener<DishesApiModel> listener) {
         getApiService().getDish(dishID)
+                .retryWhen(new RetryWithDelay(RETRIES_LIMIT, 1))
                 .subscribeOn(AppSchedulersProvider.getInstance().io())
                 .observeOn(AppSchedulersProvider.getInstance().ui())
-                .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
                 .subscribe(new Observer<DishesApiModel>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -162,9 +165,9 @@ public class CookbookClient {
 
     public void sendDishToServer(final DishModelToPost dishModelToPost, final ServerResponseListener<DishModelToPost> listener) {
         getApiService().postDish(dishModelToPost)
+                .retryWhen(new RetryWithDelay(RETRIES_LIMIT, 1))
                 .subscribeOn(AppSchedulersProvider.getInstance().io())
                 .observeOn(AppSchedulersProvider.getInstance().ui())
-                .retryWhen(throwables -> throwables.delay(1, TimeUnit.MICROSECONDS))
                 .subscribe(new Observer<DishModelToPost>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -190,9 +193,9 @@ public class CookbookClient {
 
     public void getAllIngredients(final ServerResponseListener<List<IngredientApiModel>> listener) {
         getApiService().getAllIngredients()
+                .retryWhen(new RetryWithDelay(RETRIES_LIMIT, 1))
                 .subscribeOn(AppSchedulersProvider.getInstance().io())
                 .observeOn(AppSchedulersProvider.getInstance().ui())
-                .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
                 .subscribe(new Observer<List<IngredientApiModel>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -243,4 +246,31 @@ public class CookbookClient {
                 });
     }
 
+    public class RetryWithDelay implements Function<Observable<? extends Throwable>, Observable<?>> {
+        private final int maxRetries;
+        private final int retryDelaySeconds;
+        private int retryCount;
+
+        public RetryWithDelay(final int maxRetries, final int retryDelaySeconds) {
+            this.maxRetries = maxRetries;
+            this.retryDelaySeconds = retryDelaySeconds;
+            this.retryCount = 0;
+        }
+
+        @Override
+        public Observable<?> apply(final Observable<? extends Throwable> attempts) {
+            return attempts
+                    .flatMap((Function<Throwable, Observable<?>>) throwable -> {
+                        if (++retryCount < maxRetries) {
+                            // When this Observable calls onNext, the original
+                            // Observable will be retried (i.e. re-subscribed).
+                            return Observable.timer(retryDelaySeconds,
+                                    TimeUnit.SECONDS);
+                        }
+
+                        // Max retries hit. Just pass the error along.
+                        return Observable.error(throwable);
+                    });
+        }
+    }
 }
