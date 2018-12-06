@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,7 +30,11 @@ import com.jaszczurowskip.cookbook.datasource.ServerResponseListener;
 import com.jaszczurowskip.cookbook.datasource.model.ApiError;
 import com.jaszczurowskip.cookbook.datasource.model.DishModelToPost;
 import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
+import com.jaszczurowskip.cookbook.datasource.retrofit.ApiService;
+import com.jaszczurowskip.cookbook.datasource.retrofit.RetrofitClient;
 import com.jaszczurowskip.cookbook.features.IngredientsRecyclerAdapter;
+import com.jaszczurowskip.cookbook.features.mealslist.MealsListActivity;
+import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -37,6 +42,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import retrofit2.Retrofit;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -79,27 +88,31 @@ public class AddNewMealFragment extends Fragment {
         addNewIngredientToSpinner();
         addNewIngredientToDish();
         sendNewDishToRemote();
-
     }
 
     public boolean validatePostNewDish(DishModelToPost dishModelToPost) {
         boolean valid = true;
+        String generalToast = getString(R.string.wrong_filled_dish_form);
+        String newLine = getString(R.string.new_line);
         if (dishModelToPost.getIngredientIds().isEmpty()) {
-            Toast.makeText(getContext(), R.string.wrong_filled_dish_form, Toast.LENGTH_LONG).show();
+            generalToast = generalToast.concat(newLine).concat(getString(R.string.you_didnt_choose_dish_ingredients));
             valid = false;
         }
         if (dishModelToPost.getName().isEmpty()) {
+            generalToast = generalToast.concat(newLine).concat(getString(R.string.dish_must_have_name));
             fragmentAddNewMealBinding.mealNameEt.setError(getString(R.string.dish_must_have_name));
             valid = false;
         }
         if (dishModelToPost.getRecipe().isEmpty()) {
+            generalToast = generalToast.concat(newLine).concat(getString(R.string.dish_must_have_description));
             fragmentAddNewMealBinding.mealDescriptionTv.setError(getString(R.string.dish_must_have_description));
             valid = false;
         }
         if (dishModelToPost.getPicture() == null) {
+            generalToast = generalToast.concat(newLine).concat(getString(R.string.you_didnt_choose_dish_picture));
             valid = false;
-            Toast.makeText(getContext(), R.string.wrong_filled_dish_form, Toast.LENGTH_LONG).show();
         }
+        if (!valid) Toast.makeText(getContext(), generalToast, Toast.LENGTH_LONG).show();
         return valid;
     }
 
@@ -111,6 +124,7 @@ public class AddNewMealFragment extends Fragment {
                     public void onSuccess(DishModelToPost response) {
                         Toast.makeText(getContext(), R.string.dish_added, Toast.LENGTH_LONG).show();
                         clearForm();
+                        startListActivity();
                     }
 
                     @Override
@@ -120,6 +134,11 @@ public class AddNewMealFragment extends Fragment {
                 });
             }
         });
+    }
+
+    private void startListActivity() {
+        Intent i = new Intent(getContext(), MealsListActivity.class);
+        getContext().startActivity(i);
     }
 
     private DishModelToPost preparedNewDishToPost() {
@@ -144,14 +163,13 @@ public class AddNewMealFragment extends Fragment {
         layoutManager.setFlexDirection(FlexDirection.ROW);
         layoutManager.setJustifyContent(JustifyContent.FLEX_START);
         fragmentAddNewMealBinding.ingredientsRv.setLayoutManager(layoutManager);
-        listSpinnerItems.add(getString(R.string.choose_some_ingredients));
     }
 
     private void fetchIngredientsFromRemoteWithSpinner() {
-        listSpinnerItems.clear();
         CookbookClient.getCookbookClient().getAllIngredients(new ServerResponseListener<List<IngredientApiModel>>() {
             @Override
             public void onSuccess(List<IngredientApiModel> ingredients) {
+                listSpinnerItems.clear();
                 listSpinnerItems.add(getString(R.string.choose_some_ingredients));
                 for (int i = 0; i < ingredients.size(); i++) {
                     listSpinnerItems.add(ingredients.get(i).getName());
@@ -171,11 +189,12 @@ public class AddNewMealFragment extends Fragment {
 
     private void clearForm() {
         choosenIngredients.clear();
+        addingNewIngredientToDishHashSet.clear();
         ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), choosenIngredients);
         fragmentAddNewMealBinding.ingredientsRv.setAdapter(ingredientsRecyclerAdapter);
         fragmentAddNewMealBinding.mealDescriptionTv.setText("");
         fragmentAddNewMealBinding.mealNameEt.setText("");
-        fragmentAddNewMealBinding.mealNameImg.setImageDrawable(getResources().getDrawable(R.color.colorPrimary));
+        fragmentAddNewMealBinding.mealNameImg.setImageDrawable(getResources().getDrawable(R.drawable.select_photo));
         fragmentAddNewMealBinding.ingredientsSpinner.setAdapter(spinnerAdapter);
     }
 
@@ -185,7 +204,7 @@ public class AddNewMealFragment extends Fragment {
             final AlertDialog dialog = new AlertDialog.Builder(getContext())
                     .setTitle(getString(R.string.please_type_new_ingredient))
                     .setView(taskEditText)
-                    .setPositiveButton("Add", (dialog1, which) -> {
+                    .setPositiveButton(R.string.add, (dialog1, which) -> {
                         String ingredient = String.valueOf(taskEditText.getText());
                         if (!ingredient.isEmpty()) {
                             CookbookClient.getCookbookClient().sendIngredientToServer(ingredient, new ServerResponseListener<String>() {
@@ -196,9 +215,11 @@ public class AddNewMealFragment extends Fragment {
 
                                 @Override
                                 public void onError(ApiError error) {
-                                    Toast.makeText(getContext(), R.string.server_is_not_responding, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_LONG).show();
                                 }
                             });
+                            updateSpinner();
+
                         } else {
                             Toast.makeText(getContext(), R.string.new_ingredient_must_contain_name, Toast.LENGTH_LONG).show();
                         }
@@ -207,9 +228,21 @@ public class AddNewMealFragment extends Fragment {
                     .create();
             dialog.show();
         });
-
     }
 
+   public void updateSpinner(){
+       Thread timer = new Thread() {
+           public void run(){
+               try {
+                   sleep(500);
+                   fetchIngredientsFromRemoteWithSpinner();
+               } catch (InterruptedException e) {
+                   e.printStackTrace();
+               }
+           }
+       };
+       timer.start();
+   }
     private void addNewIngredientToDish() {
         fragmentAddNewMealBinding.ingredientsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -255,7 +288,7 @@ public class AddNewMealFragment extends Fragment {
             }
 
         } else {
-            Toast.makeText(getContext(), R.string.you_dont_choose_picture, Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), R.string.you_didnt_choose_dish_picture, Toast.LENGTH_LONG).show();
         }
     }
 

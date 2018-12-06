@@ -97,8 +97,10 @@
                 android:background="@drawable/ingredient_container_style_white"
                 android:textColor="@android:color/black"
                 android:textColorHint="@android:color/black"
-                android:layout_height="match_parent"
-                android:hint="Describe recipe of the dish" />
+                android:gravity="top"
+                android:minHeight="150dp"
+                android:layout_height="wrap_content"
+                android:hint="@string/describe_recipe_of_the_dish" />
         </ScrollView>
 
         <android.support.design.widget.FloatingActionButton
