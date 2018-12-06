@@ -24,4 +24,5 @@
     <string name="you_didnt_choose_dish_picture">You didn\'t choose dish picture.</string>
     <string name="new_line">\n - </string>
     <string name="describe_recipe_of_the_dish">Describe recipe of the dish</string>
+    <string name="add">Add</string>
 </resources>
