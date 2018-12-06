@@ -80,7 +80,6 @@ public class AddNewMealFragment extends Fragment {
         addNewIngredientToSpinner();
         addNewIngredientToDish();
         sendNewDishToRemote();
-
     }
 
     public boolean validatePostNewDish(DishModelToPost dishModelToPost) {

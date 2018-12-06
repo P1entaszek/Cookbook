@@ -64,12 +64,12 @@ public class MealsListFragment extends Fragment {
     private void initView() {
         progressBar = new FadingCircle();
         fragmentMealsListBinding.progressBar.setIndeterminateDrawable(progressBar);
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(createHelperCallback());
-        itemTouchHelper.attachToRecyclerView(fragmentMealsListBinding.mealsListRecycler);
+        /*ItemTouchHelper itemTouchHelper = new ItemTouchHelper(createHelperCallback());
+        itemTouchHelper.attachToRecyclerView(fragmentMealsListBinding.mealsListRecycler);*/
         fetchDataFromRemote();
     }
 
-    private ItemTouchHelper.Callback createHelperCallback() {
+   /* private ItemTouchHelper.Callback createHelperCallback() {
         return new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
@@ -102,7 +102,7 @@ public class MealsListFragment extends Fragment {
                 Toast.makeText(getContext(), R.string.cant_delete_dish, Toast.LENGTH_LONG).show();
             }
         });
-    }
+    }*/
 
     private void recyclerLoadingVisibility(boolean isRecyclerLoading) {
         if (isRecyclerLoading) {
