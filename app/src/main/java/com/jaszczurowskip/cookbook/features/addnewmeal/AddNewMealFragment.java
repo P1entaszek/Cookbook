@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,8 +30,11 @@ import com.jaszczurowskip.cookbook.datasource.ServerResponseListener;
 import com.jaszczurowskip.cookbook.datasource.model.ApiError;
 import com.jaszczurowskip.cookbook.datasource.model.DishModelToPost;
 import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
+import com.jaszczurowskip.cookbook.datasource.retrofit.ApiService;
+import com.jaszczurowskip.cookbook.datasource.retrofit.RetrofitClient;
 import com.jaszczurowskip.cookbook.features.IngredientsRecyclerAdapter;
 import com.jaszczurowskip.cookbook.features.mealslist.MealsListActivity;
+import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -38,6 +42,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import retrofit2.Retrofit;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -155,14 +163,13 @@ public class AddNewMealFragment extends Fragment {
         layoutManager.setFlexDirection(FlexDirection.ROW);
         layoutManager.setJustifyContent(JustifyContent.FLEX_START);
         fragmentAddNewMealBinding.ingredientsRv.setLayoutManager(layoutManager);
-        listSpinnerItems.add(getString(R.string.choose_some_ingredients));
     }
 
     private void fetchIngredientsFromRemoteWithSpinner() {
-        listSpinnerItems.clear();
         CookbookClient.getCookbookClient().getAllIngredients(new ServerResponseListener<List<IngredientApiModel>>() {
             @Override
             public void onSuccess(List<IngredientApiModel> ingredients) {
+                listSpinnerItems.clear();
                 listSpinnerItems.add(getString(R.string.choose_some_ingredients));
                 for (int i = 0; i < ingredients.size(); i++) {
                     listSpinnerItems.add(ingredients.get(i).getName());
@@ -197,7 +204,7 @@ public class AddNewMealFragment extends Fragment {
             final AlertDialog dialog = new AlertDialog.Builder(getContext())
                     .setTitle(getString(R.string.please_type_new_ingredient))
                     .setView(taskEditText)
-                    .setPositiveButton("Add", (dialog1, which) -> {
+                    .setPositiveButton(R.string.add, (dialog1, which) -> {
                         String ingredient = String.valueOf(taskEditText.getText());
                         if (!ingredient.isEmpty()) {
                             CookbookClient.getCookbookClient().sendIngredientToServer(ingredient, new ServerResponseListener<String>() {
@@ -208,9 +215,11 @@ public class AddNewMealFragment extends Fragment {
 
                                 @Override
                                 public void onError(ApiError error) {
-                                    Toast.makeText(getContext(), R.string.server_is_not_responding, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_LONG).show();
                                 }
                             });
+                            updateSpinner();
+
                         } else {
                             Toast.makeText(getContext(), R.string.new_ingredient_must_contain_name, Toast.LENGTH_LONG).show();
                         }
@@ -219,9 +228,21 @@ public class AddNewMealFragment extends Fragment {
                     .create();
             dialog.show();
         });
-
     }
 
+   public void updateSpinner(){
+       Thread timer = new Thread() {
+           public void run(){
+               try {
+                   sleep(500);
+                   fetchIngredientsFromRemoteWithSpinner();
+               } catch (InterruptedException e) {
+                   e.printStackTrace();
+               }
+           }
+       };
+       timer.start();
+   }
     private void addNewIngredientToDish() {
         fragmentAddNewMealBinding.ingredientsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

@@ -221,6 +221,7 @@ public class CookbookClient {
 
     public void sendIngredientToServer(final String ingredient, final ServerResponseListener<String> listener) {
         getApiService().postIngredient(ingredient)
+                .retryWhen(new RetryWithDelay(RETRIES_LIMIT, 1))
                 .subscribeOn(AppSchedulersProvider.getInstance().io())
                 .observeOn(AppSchedulersProvider.getInstance().ui())
                 .subscribe(new Observer<String>() {
