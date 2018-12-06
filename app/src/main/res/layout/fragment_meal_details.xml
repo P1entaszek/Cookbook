@@ -22,17 +22,18 @@
 
         <TextView
             android:id="@+id/meal_name_tv"
-            android:layout_width="0dp"
+            android:layout_width="352dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:textSize="20sp"
-            android:textColor="@android:color/white"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             android:gravity="center"
-            app:layout_constraintBottom_toBottomOf="@+id/meal_img"
-            app:layout_constraintEnd_toEndOf="@+id/meal_img"
-            app:layout_constraintStart_toStartOf="@+id/meal_img"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/progress_bar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/meal_img"
             tools:text="Meal name" />
 
         <FrameLayout
@@ -42,19 +43,16 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="@+id/meal_img"
+            app:layout_constraintEnd_toEndOf="@+id/meal_name_tv"
             app:layout_constraintHorizontal_bias="0.6"
-            app:layout_constraintStart_toStartOf="@+id/meal_img"
-            app:layout_constraintTop_toBottomOf="@+id/meal_img">
+            app:layout_constraintStart_toStartOf="@+id/meal_name_tv"
+            app:layout_constraintTop_toBottomOf="@+id/meal_name_tv">
 
             <android.support.v7.widget.RecyclerView
-                android:orientation="vertical"
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_constraintEnd_toEndOf="@+id/ingredients_gridview"
-                app:layout_constraintStart_toStartOf="@+id/ingredients_gridview"
-                app:layout_constraintTop_toBottomOf="@+id/ingredients_gridview" />
+                android:orientation="vertical" />
         </FrameLayout>
 
         <android.support.v4.widget.NestedScrollView
