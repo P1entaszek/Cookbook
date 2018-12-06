@@ -13,7 +13,7 @@
             android:id="@+id/meal_name_et"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="20dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:gravity="center_vertical"
@@ -40,10 +40,10 @@
 
         <Spinner
             android:id="@+id/ingredients_spinner"
-            android:layout_width="320dp"
+            android:layout_width="305dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="18dp"
             app:layout_constraintEnd_toStartOf="@+id/add_ingredients_bttn"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/meal_name_img" />
@@ -82,9 +82,10 @@
             android:id="@+id/recipe_scroll_layout"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -115,5 +116,40 @@
             android:text="@android:string/ok"
             app:layout_constraintBottom_toBottomOf="@+id/recipe_scroll_layout"
             app:layout_constraintEnd_toEndOf="@+id/recipe_scroll_layout" />
+
+        <TextView
+            android:id="@+id/dish_description_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Dish description"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/add_ingredients_bttn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ingredients_spinner" />
+
+        <TextView
+            android:id="@+id/ingredients_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_marginStart="8dp"
+            android:text="Ingredients"
+            android:textColor="@android:color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/meal_name_img" />
+
+        <TextView
+            android:id="@+id/dish_name_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="Type dish name"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toTopOf="@+id/meal_name_et"
+            app:layout_constraintStart_toStartOf="@+id/meal_name_et"
+            app:layout_constraintTop_toTopOf="@+id/meal_name_img" />
     </android.support.constraint.ConstraintLayout>
 </layout>
