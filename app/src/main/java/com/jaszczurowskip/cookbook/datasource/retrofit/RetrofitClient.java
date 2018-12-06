@@ -20,7 +20,4 @@ public class RetrofitClient {
         }
         return instance;
     }
-
-    private RetrofitClient() {
-    }
 }

@@ -4,6 +4,7 @@ package com.jaszczurowskip.cookbook.features.mealdetails;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,26 +21,20 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.databinding.FragmentMealDetailsBinding;
+import com.jaszczurowskip.cookbook.datasource.CookbookClient;
+import com.jaszczurowskip.cookbook.datasource.ServerResponseListener;
+import com.jaszczurowskip.cookbook.datasource.model.ApiError;
 import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
-import com.jaszczurowskip.cookbook.datasource.retrofit.ApiService;
-import com.jaszczurowskip.cookbook.datasource.retrofit.RetrofitClient;
 import com.jaszczurowskip.cookbook.features.IngredientsRecyclerAdapter;
-import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
 
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
-import retrofit2.Retrofit;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class MealDetailsFragment extends Fragment {
     private static final String EXTRA_ITEM_ID = "EXTRA_ITEM_ID";
-    private Retrofit retrofit;
-    private ApiService apiService;
+    private static final String MEAL_DETAILS_FRAGMENT = MealDetailsFragment.class.getSimpleName();
     private FragmentMealDetailsBinding fragmentMealDetailsBinding;
     private long dishId;
     private Sprite progressBar;
@@ -67,7 +62,6 @@ public class MealDetailsFragment extends Fragment {
 
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        initRetrofit();
         initView();
     }
 
@@ -78,41 +72,25 @@ public class MealDetailsFragment extends Fragment {
         layoutManager.setFlexDirection(FlexDirection.ROW);
         layoutManager.setJustifyContent(JustifyContent.FLEX_START);
         fragmentMealDetailsBinding.recyclerView.setLayoutManager(layoutManager);
-        fetchDataFromRemote();
+        fetchDataFromRemote(dishId);
     }
 
-    private void initRetrofit() {
-        retrofit = RetrofitClient.getRetrofitInstance();
-        apiService = retrofit.create(ApiService.class);
-    }
+    private void fetchDataFromRemote(final long dishId) {
+        fragmentMealDetailsBinding.progressBar.setVisibility(View.VISIBLE);
+        CookbookClient.getCookbookClient().getDish(dishId, new ServerResponseListener<DishesApiModel>() {
+            @Override
+            public void onSuccess(DishesApiModel dish) {
+                fragmentMealDetailsBinding.progressBar.setVisibility(View.INVISIBLE);
+                displayData(dish);
+            }
 
-    private void fetchDataFromRemote() {
-        apiService.getDish(dishId)
-                .subscribeOn(AppSchedulersProvider.getInstance().io())
-                .observeOn(AppSchedulersProvider.getInstance().ui())
-                .retryWhen(throwables -> throwables.delay(2, TimeUnit.SECONDS))
-                .subscribe(new Observer<DishesApiModel>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        //no-op
-                    }
-
-                    @Override
-                    public void onNext(DishesApiModel dishesApiModel) {
-                        displayData(dishesApiModel);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                        Toast.makeText(getContext(), R.string.Please_check_your_internet_connection, Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        fragmentMealDetailsBinding.progressBar.setVisibility(View.INVISIBLE);
-                    }
-                });
+            @Override
+            public void onError(ApiError error) {
+                Log.d(MEAL_DETAILS_FRAGMENT, error.getMessage());
+                fragmentMealDetailsBinding.progressBar.setVisibility(View.INVISIBLE);
+                Toast.makeText(getContext(), R.string.please_check_your_internet_connection, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void displayData(DishesApiModel dishesApiModel) {
