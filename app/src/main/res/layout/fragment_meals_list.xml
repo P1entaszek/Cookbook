@@ -16,7 +16,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:ems="10"
-        android:hint="@string/type_some_ingredients"
+        android:hint="@string/type_some_dish_or_ingredients"
         android:inputType=""
         android:padding="10dp"
         android:background="@drawable/ingredient_container_style_white"
