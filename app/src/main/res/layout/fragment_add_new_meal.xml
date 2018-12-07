@@ -17,7 +17,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:gravity="center_vertical"
-            android:hint="@string/name_the_meal"
+            android:hint="@string/type_dish_name"
             android:padding="10dp"
             android:background="@drawable/ingredient_container_style_white"
             android:textColor="@android:color/black"
@@ -101,7 +101,7 @@
                 android:gravity="top"
                 android:minHeight="150dp"
                 android:layout_height="wrap_content"
-                android:hint="@string/describe_recipe_of_the_dish" />
+                android:hint="@string/type_dish_recipe" />
         </ScrollView>
 
         <android.support.design.widget.FloatingActionButton
