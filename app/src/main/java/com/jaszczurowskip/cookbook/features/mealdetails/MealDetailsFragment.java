@@ -3,8 +3,8 @@ package com.jaszczurowskip.cookbook.features.mealdetails;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,24 +21,24 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.databinding.FragmentMealDetailsBinding;
-import com.jaszczurowskip.cookbook.datasource.CookbookClient;
-import com.jaszczurowskip.cookbook.datasource.ServerResponseListener;
-import com.jaszczurowskip.cookbook.datasource.model.ApiError;
 import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
 import com.jaszczurowskip.cookbook.features.IngredientsRecyclerAdapter;
+import com.jaszczurowskip.cookbook.features.mealdetails.mvp.MealDetailsMVP;
+import com.jaszczurowskip.cookbook.features.mealdetails.mvp.MealDetailsPresenter;
 
 import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MealDetailsFragment extends Fragment {
+public class MealDetailsFragment extends Fragment implements MealDetailsMVP.View {
     private static final String EXTRA_ITEM_ID = "EXTRA_ITEM_ID";
     private static final String MEAL_DETAILS_FRAGMENT = MealDetailsFragment.class.getSimpleName();
     private FragmentMealDetailsBinding fragmentMealDetailsBinding;
     private long dishId;
     private Sprite progressBar;
     private IngredientsRecyclerAdapter ingredientsRecyclerAdapter;
+    private MealDetailsPresenter mPresenter;
 
     public MealDetailsFragment() {
         // Required empty public constructor
@@ -62,46 +62,14 @@ public class MealDetailsFragment extends Fragment {
 
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        initView();
     }
 
-    private void initView() {
-        progressBar = new FadingCircle();
-        fragmentMealDetailsBinding.progressBar.setIndeterminateDrawable(progressBar);
-        FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
-        layoutManager.setFlexDirection(FlexDirection.ROW);
-        layoutManager.setJustifyContent(JustifyContent.FLEX_START);
-        fragmentMealDetailsBinding.recyclerView.setLayoutManager(layoutManager);
-        fetchDataFromRemote(dishId);
-    }
-
-    private void fetchDataFromRemote(final long dishId) {
-        fragmentMealDetailsBinding.progressBar.setVisibility(View.VISIBLE);
-        CookbookClient.getCookbookClient().getDish(dishId, new ServerResponseListener<DishesApiModel>() {
-            @Override
-            public void onSuccess(DishesApiModel dish) {
-                fragmentMealDetailsBinding.progressBar.setVisibility(View.INVISIBLE);
-                displayData(dish);
-            }
-
-            @Override
-            public void onError(ApiError error) {
-                Log.d(MEAL_DETAILS_FRAGMENT, error.getMessage());
-                fragmentMealDetailsBinding.progressBar.setVisibility(View.INVISIBLE);
-                Toast.makeText(getContext(), R.string.please_check_your_internet_connection, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    private void displayData(DishesApiModel dishesApiModel) {
-        ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), dishesApiModel.getIngredients());
-        fragmentMealDetailsBinding.recyclerView.setAdapter(ingredientsRecyclerAdapter);
-        fragmentMealDetailsBinding.mealNameTv.setText(dishesApiModel.getName());
-        fragmentMealDetailsBinding.mealDescriptionTv.setText(dishesApiModel.getRecipe());
-        RequestOptions requestOptions = new RequestOptions();
-        requestOptions.centerCrop();
-        Glide.with(getContext())
-                .load(dishesApiModel.getPicture()).apply(new RequestOptions().transforms(new CenterCrop(), new RoundedCorners(45))).into(fragmentMealDetailsBinding.mealImg);
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mPresenter = new MealDetailsPresenter();
+        mPresenter.attach(this);
+        mPresenter.initView();
     }
 
     @Override
@@ -109,5 +77,51 @@ public class MealDetailsFragment extends Fragment {
                              Bundle savedInstanceState) {
         fragmentMealDetailsBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_meal_details, container, false);
         return fragmentMealDetailsBinding.getRoot();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mPresenter.destroy();
+    }
+
+    @Override
+    public void setupview() {
+        progressBar = new FadingCircle();
+        fragmentMealDetailsBinding.progressBar.setIndeterminateDrawable(progressBar);
+        FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
+        layoutManager.setFlexDirection(FlexDirection.ROW);
+        layoutManager.setJustifyContent(JustifyContent.FLEX_START);
+        fragmentMealDetailsBinding.recyclerView.setLayoutManager(layoutManager);
+        mPresenter.getMealsListFromService(dishId);
+    }
+
+    @Override
+    public void showProgressDialog() {
+        fragmentMealDetailsBinding.progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void dismissProgressDialog() {
+        fragmentMealDetailsBinding.progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void showError(String error) {
+        Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void displayList(DishesApiModel dishesApiModel) {
+        ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), dishesApiModel.getIngredients());
+        fragmentMealDetailsBinding.recyclerView.setAdapter(ingredientsRecyclerAdapter);
+        fragmentMealDetailsBinding.mealNameTv.setText(dishesApiModel.getName());
+        fragmentMealDetailsBinding.mealDescriptionTv.setText(dishesApiModel.getRecipe());
+        RequestOptions requestOptions = new RequestOptions();
+        requestOptions.centerCrop();
+        Glide.with(getContext())
+                .load(dishesApiModel.getPicture())
+                .apply(new RequestOptions().transforms(new CenterCrop(), new RoundedCorners(45)))
+                .into(fragmentMealDetailsBinding.mealImg);
     }
 }
