@@ -1,26 +1,19 @@
-package com.jaszczurowskip.cookbook.features.mealslist;
+package com.jaszczurowskip.cookbook.features.disheslist;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
-import com.jaszczurowskip.cookbook.features.mealdetails.MealDetailsActivity;
-import com.jaszczurowskip.cookbook.utils.Utils;
+import com.jaszczurowskip.cookbook.features.dishdetails.DishDetailsActivity;
 
 import java.util.List;
 
@@ -83,7 +76,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.CustomView> {
     }
 
     private void startDetailActivity(int position) {
-        Intent i = new Intent(context, MealDetailsActivity.class);
+        Intent i = new Intent(context, DishDetailsActivity.class);
         long id = listOfData.get(position).getId();
         i.putExtra(EXTRA_ITEM_ID, String.valueOf(id));
         context.startActivity(i);

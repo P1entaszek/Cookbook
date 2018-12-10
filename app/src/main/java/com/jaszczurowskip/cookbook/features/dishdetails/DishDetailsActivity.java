@@ -1,33 +1,28 @@
-package com.jaszczurowskip.cookbook.features.mealdetails;
+package com.jaszczurowskip.cookbook.features.dishdetails;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.AppCompatTextView;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.utils.BaseActivity;
 
-import java.util.ArrayList;
-
-public class MealDetailsActivity extends BaseActivity {
+public class DishDetailsActivity extends BaseActivity {
     private static final String MEAL_DETAILS_FRAG = "MEAL_DETAILS_FRAG";
     private static final String EXTRA_ITEM_ID = "EXTRA_ITEM_ID";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meal_details);
         Intent i = getIntent();
         if (i.hasExtra(EXTRA_ITEM_ID)) {
             String dish = i.getStringExtra(EXTRA_ITEM_ID);
             FragmentManager manager = getSupportFragmentManager();
-            MealDetailsFragment fragment = (MealDetailsFragment) manager.findFragmentByTag(MEAL_DETAILS_FRAG);
+            DishDetailsFragment fragment = (DishDetailsFragment) manager.findFragmentByTag(MEAL_DETAILS_FRAG);
             if (fragment == null) {
-                fragment = MealDetailsFragment.newInstance(dish);
+                fragment = DishDetailsFragment.newInstance(dish);
             }
             addFragmentToActivity(manager, fragment, R.id.root_activity_meal_details, MEAL_DETAILS_FRAG);
         }

@@ -1,4 +1,4 @@
-package com.jaszczurowskip.cookbook.features.addnewmeal;
+package com.jaszczurowskip.cookbook.features.addnewdish;
 
 
 import android.app.AlertDialog;
@@ -30,7 +30,7 @@ import com.jaszczurowskip.cookbook.datasource.model.ApiError;
 import com.jaszczurowskip.cookbook.datasource.model.DishModelToPost;
 import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
 import com.jaszczurowskip.cookbook.features.IngredientsRecyclerAdapter;
-import com.jaszczurowskip.cookbook.features.mealslist.MealsListActivity;
+import com.jaszczurowskip.cookbook.features.disheslist.DishesListActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -44,7 +44,7 @@ import static android.app.Activity.RESULT_OK;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AddNewMealFragment extends Fragment {
+public class AddNewDishFragment extends Fragment {
     private static int RESULT_LOAD_IMG = 0;
     private static String ADD_NEW_MEAL_FRAGMENT = "ADD_NEW_MEAL_FRAGMENT";
     private static String typeOfImage = "data:image/jpeg;base64,";
@@ -58,12 +58,12 @@ public class AddNewMealFragment extends Fragment {
     private ArrayAdapter<String> spinnerAdapter;
 
 
-    public AddNewMealFragment() {
+    public AddNewDishFragment() {
         // Required empty public constructor
     }
 
-    public static AddNewMealFragment newInstance() {
-        return new AddNewMealFragment();
+    public static AddNewDishFragment newInstance() {
+        return new AddNewDishFragment();
     }
 
     public static String encodeToBase64(Bitmap image, Bitmap.CompressFormat compressFormat, int quality) {
@@ -129,7 +129,7 @@ public class AddNewMealFragment extends Fragment {
     }
 
     private void startListActivity() {
-        Intent i = new Intent(getContext(), MealsListActivity.class);
+        Intent i = new Intent(getContext(), DishesListActivity.class);
         getContext().startActivity(i);
     }
 

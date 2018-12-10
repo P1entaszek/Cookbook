@@ -7,7 +7,7 @@
         android:id="@+id/add_new_meal_layout_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".features.addnewmeal.AddNewMealFragment">
+        tools:context=".features.addnewdish.AddNewDishFragment">
 
         <EditText
             android:id="@+id/meal_name_et"

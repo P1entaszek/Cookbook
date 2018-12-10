@@ -7,7 +7,7 @@
     android:id="@+id/meals_list_layout_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".features.mealslist.MealsListFragment">
+    tools:context=".features.disheslist.DishesListFragment">
 
     <EditText
         android:id="@+id/search_ingredients_bar"

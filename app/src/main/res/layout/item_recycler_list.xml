@@ -8,7 +8,7 @@ android:id="@+id/root_list_item"
 android:layout_width="match_parent"
 android:layout_height="wrap_content"
 android:padding="5sp"
-tools:context="com.jaszczurowskip.cookbook.features.mealslist.MealsListActivity">
+tools:context="com.jaszczurowskip.cookbook.features.disheslist.DishesListActivity">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imgv_list_item"
