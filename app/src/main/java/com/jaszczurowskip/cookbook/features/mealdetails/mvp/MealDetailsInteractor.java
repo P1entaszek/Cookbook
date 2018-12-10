@@ -11,7 +11,7 @@ import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
 public class MealDetailsInteractor implements MealDetailsMVP.Interactor {
 
     @Override
-    public void getMealDetails(long dishID, MealsDetailsInteractorCallback callback) {
+    public void getMealDetails(long dishID, final MealsDetailsInteractorCallback callback) {
         CookbookClient.getCookbookClient().getDish(dishID, new ServerResponseListener<DishesApiModel>() {
             @Override
             public void onSuccess(DishesApiModel response) {

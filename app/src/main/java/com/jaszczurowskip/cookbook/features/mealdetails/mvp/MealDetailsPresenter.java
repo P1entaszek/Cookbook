@@ -8,22 +8,13 @@ import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
 /**
  * Created by jaszczurowskip on 07.12.2018
  */
-public class MealDetailsPresenter implements MealDetailsMVP.Presenter {
+public class MealDetailsPresenter implements MealDetailsMVP.Presenter, MealDetailsMVP.Interactor.MealsDetailsInteractorCallback {
 
     private MealDetailsMVP.View mView;
+    private MealDetailsMVP.Interactor interactor;
 
     public MealDetailsPresenter() {
-    }
-
-
-    @Override
-    public void onSuccess(DishesApiModel dish) {
-
-    }
-
-    @Override
-    public void onError(ApiError error) {
-
+        this.interactor = new MealDetailsInteractor();
     }
 
     @Override
@@ -43,19 +34,19 @@ public class MealDetailsPresenter implements MealDetailsMVP.Presenter {
     }
 
     @Override
-    public void getMealsListFromService(long dishId) {
-        CookbookClient.getCookbookClient().getDish(dishId, new ServerResponseListener<DishesApiModel>() {
-            @Override
-            public void onSuccess(DishesApiModel dish) {
-                mView.dismissProgressDialog();
-                mView.displayList(dish);
-            }
+    public void gotMealsListFromService(long dishId) {
+        interactor.getMealDetails(dishId, this);
+    }
 
-            @Override
-            public void onError(ApiError error) {
-                mView.dismissProgressDialog();
-                mView.showError(error.getMessage());
-            }
-        });
+    @Override
+    public void onSuccess(DishesApiModel dish) {
+        mView.dismissProgressDialog();
+        mView.displayList(dish);
+    }
+
+    @Override
+    public void onError(ApiError error) {
+        mView.dismissProgressDialog();
+        mView.showError(error.getMessage());
     }
 }

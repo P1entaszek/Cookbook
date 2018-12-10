@@ -3,6 +3,7 @@ package com.jaszczurowskip.cookbook.features.mealdetails;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -33,7 +34,6 @@ import java.util.Objects;
  */
 public class MealDetailsFragment extends Fragment implements MealDetailsMVP.View {
     private static final String EXTRA_ITEM_ID = "EXTRA_ITEM_ID";
-    private static final String MEAL_DETAILS_FRAGMENT = MealDetailsFragment.class.getSimpleName();
     private FragmentMealDetailsBinding fragmentMealDetailsBinding;
     private long dishId;
     private Sprite progressBar;
@@ -44,7 +44,7 @@ public class MealDetailsFragment extends Fragment implements MealDetailsMVP.View
         // Required empty public constructor
     }
 
-    public static MealDetailsFragment newInstance(final String dish) {
+    public static MealDetailsFragment newInstance(@NonNull final String dish) {
         MealDetailsFragment mealDetailsFragment = new MealDetailsFragment();
         Bundle args = new Bundle();
         args.putString(EXTRA_ITEM_ID, dish);
@@ -54,18 +54,18 @@ public class MealDetailsFragment extends Fragment implements MealDetailsMVP.View
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         this.dishId = Long.parseLong(Objects.requireNonNull(Objects.requireNonNull(args).getString(EXTRA_ITEM_ID)));
     }
 
-    public void onActivityCreated(Bundle savedInstanceState) {
+    public void onActivityCreated(final @Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull final View view, @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mPresenter = new MealDetailsPresenter();
         mPresenter.attach(this);
@@ -73,8 +73,8 @@ public class MealDetailsFragment extends Fragment implements MealDetailsMVP.View
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull final LayoutInflater inflater, @NonNull final ViewGroup container,
+                             @Nullable final Bundle savedInstanceState) {
         fragmentMealDetailsBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_meal_details, container, false);
         return fragmentMealDetailsBinding.getRoot();
     }
@@ -93,7 +93,7 @@ public class MealDetailsFragment extends Fragment implements MealDetailsMVP.View
         layoutManager.setFlexDirection(FlexDirection.ROW);
         layoutManager.setJustifyContent(JustifyContent.FLEX_START);
         fragmentMealDetailsBinding.recyclerView.setLayoutManager(layoutManager);
-        mPresenter.getMealsListFromService(dishId);
+        mPresenter.gotMealsListFromService(dishId);
     }
 
     @Override
@@ -107,12 +107,12 @@ public class MealDetailsFragment extends Fragment implements MealDetailsMVP.View
     }
 
     @Override
-    public void showError(String error) {
+    public void showError(final @Nullable String error) {
         Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
     }
 
     @Override
-    public void displayList(DishesApiModel dishesApiModel) {
+    public void displayList(final @NonNull DishesApiModel dishesApiModel) {
         ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), dishesApiModel.getIngredients());
         fragmentMealDetailsBinding.recyclerView.setAdapter(ingredientsRecyclerAdapter);
         fragmentMealDetailsBinding.mealNameTv.setText(dishesApiModel.getName());

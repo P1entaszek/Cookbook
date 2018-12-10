@@ -22,11 +22,11 @@
 
         <TextView
             android:id="@+id/meal_name_tv"
-            android:layout_width="352dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
             android:gravity="center"
             android:textColor="@android:color/white"
             android:textSize="20sp"

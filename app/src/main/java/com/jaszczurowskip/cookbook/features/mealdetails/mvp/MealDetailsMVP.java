@@ -19,10 +19,10 @@ public interface MealDetailsMVP {
     }
 
 
-    interface Presenter extends Interactor.MealsDetailsInteractorCallback {
+    interface Presenter {
         void attach(View view);
 
-        void getMealsListFromService(long dishId);
+        void gotMealsListFromService(long dishId);
 
         void destroy();
 
