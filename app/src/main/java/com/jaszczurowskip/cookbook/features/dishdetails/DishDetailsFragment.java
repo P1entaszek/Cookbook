@@ -36,8 +36,6 @@ public class DishDetailsFragment extends Fragment implements DishDetailsMVP.View
     private static final String EXTRA_ITEM_ID = "EXTRA_ITEM_ID";
     private FragmentMealDetailsBinding fragmentMealDetailsBinding;
     private long dishId;
-    private Sprite progressBar;
-    private IngredientsRecyclerAdapter ingredientsRecyclerAdapter;
     private DishDetailsPresenter presenter;
 
     public DishDetailsFragment() {
@@ -87,7 +85,7 @@ public class DishDetailsFragment extends Fragment implements DishDetailsMVP.View
 
     @Override
     public void setupview() {
-        progressBar = new FadingCircle();
+        Sprite progressBar = new FadingCircle();
         fragmentMealDetailsBinding.progressBar.setIndeterminateDrawable(progressBar);
         FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
         layoutManager.setFlexDirection(FlexDirection.ROW);
@@ -113,13 +111,11 @@ public class DishDetailsFragment extends Fragment implements DishDetailsMVP.View
 
     @Override
     public void displayDish(final @NonNull DishesApiModel dishesApiModel) {
-        ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), dishesApiModel.getIngredients());
+        IngredientsRecyclerAdapter ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), dishesApiModel.getIngredients());
         fragmentMealDetailsBinding.recyclerView.setAdapter(ingredientsRecyclerAdapter);
         fragmentMealDetailsBinding.mealNameTv.setText(dishesApiModel.getName());
         fragmentMealDetailsBinding.mealDescriptionTv.setText(dishesApiModel.getRecipe());
-        RequestOptions requestOptions = new RequestOptions();
-        requestOptions.centerCrop();
-        Glide.with(getContext())
+        Glide.with(Objects.requireNonNull(getContext()))
                 .load(dishesApiModel.getPicture())
                 .apply(new RequestOptions().transforms(new CenterCrop(), new RoundedCorners(45)))
                 .into(fragmentMealDetailsBinding.mealImg);
