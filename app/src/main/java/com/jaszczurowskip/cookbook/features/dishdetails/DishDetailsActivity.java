@@ -15,7 +15,7 @@ public class DishDetailsActivity extends BaseActivity {
     @Override
     protected void onCreate(final @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_meal_details);
+        setContentView(R.layout.activity_dish_details);
         Intent i = getIntent();
         if (i.hasExtra(EXTRA_ITEM_ID)) {
             String dish = i.getStringExtra(EXTRA_ITEM_ID);
