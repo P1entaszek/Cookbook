@@ -30,8 +30,11 @@ import java.util.List;
  * A simple {@link Fragment} subclass.
  */
 public class DishesListFragment extends Fragment implements DishesListMVP.View {
+    @NonNull
     private FragmentDishesListBinding fragmentDishesListBinding;
+    @NonNull
     private DishesListMVP.Presenter presenter;
+    @Nullable
     private List<DishesApiModel> dishesList;
 
     public DishesListFragment() {

@@ -34,8 +34,10 @@ import java.util.Objects;
  */
 public class DishDetailsFragment extends Fragment implements DishDetailsMVP.View {
     private static final String EXTRA_ITEM_ID = "EXTRA_ITEM_ID";
+    @NonNull
     private FragmentDishDetailsBinding fragmentDishDetailsBinding;
     private long dishId;
+    @NonNull
     private DishDetailsPresenter presenter;
 
     public DishDetailsFragment() {
@@ -43,7 +45,8 @@ public class DishDetailsFragment extends Fragment implements DishDetailsMVP.View
     }
 
     public static DishDetailsFragment newInstance(@NonNull final String dish) {
-        DishDetailsFragment dishDetailsFragment = new DishDetailsFragment();
+        @NonNull
+        final DishDetailsFragment dishDetailsFragment = new DishDetailsFragment();
         Bundle args = new Bundle();
         args.putString(EXTRA_ITEM_ID, dish);
         dishDetailsFragment.setArguments(args);

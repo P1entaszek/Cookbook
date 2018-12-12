@@ -1,5 +1,8 @@
 package com.jaszczurowskip.cookbook.datasource;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.google.gson.Gson;
 import com.jaszczurowskip.cookbook.datasource.model.ApiError;
 import com.jaszczurowskip.cookbook.datasource.model.DishModelToPost;
@@ -36,7 +39,8 @@ public class CookbookClient {
     }
 
     private ApiService getApiService() {
-        Retrofit retrofit = RetrofitClient.getRetrofitInstance();
+        @NonNull
+        final Retrofit retrofit = RetrofitClient.getRetrofitInstance();
         return retrofit.create(ApiService.class);
     }
 

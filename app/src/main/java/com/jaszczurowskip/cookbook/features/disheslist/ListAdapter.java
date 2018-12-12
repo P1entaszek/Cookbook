@@ -3,6 +3,7 @@ package com.jaszczurowskip.cookbook.features.disheslist;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,8 +24,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jaszczurowskip on 15.11.2018
  */
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.CustomView> {
+    @NonNull
     private final Context context;
+    @Nullable
     private LayoutInflater layoutInflater;
+    @NonNull
     private final List<DishesApiModel> listOfData;
     private static final String EXTRA_ITEM_ID = "EXTRA_ITEM_ID";
 
@@ -57,9 +61,12 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.CustomView> {
     }
 
     class CustomView extends RecyclerView.ViewHolder implements View.OnClickListener {
-        CircleImageView mealImage;
-        TextView mealName;
-        ConstraintLayout constraintLayout;
+        @NonNull
+        private final CircleImageView mealImage;
+        @NonNull
+        private final TextView mealName;
+        @NonNull
+        private final ConstraintLayout constraintLayout;
 
         CustomView(final @NonNull View itemView) {
             super(itemView);

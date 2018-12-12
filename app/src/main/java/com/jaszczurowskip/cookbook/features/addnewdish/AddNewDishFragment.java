@@ -45,14 +45,21 @@ public class AddNewDishFragment extends Fragment implements AddNewDishMVP.View {
     private static final int DIDNT_CHOOSE_INGREDIENTS = 3;
     private static int RESULT_LOAD_IMG = 0;
 
+    @NonNull
     private FragmentAddNewDishBinding fragmentAddNewDishBinding;
-    private ArrayList<String> listSpinnerItems = new ArrayList<>();
-    private LinkedHashSet<String> addingNewIngredientToDishHashSet = new LinkedHashSet<>();
-    private ArrayList<IngredientApiModel> ingredientArrayList = new ArrayList<>();
-    private ArrayList<IngredientApiModel> choosenIngredients = new ArrayList<>();
+    @NonNull
+    private final ArrayList<String> listSpinnerItems = new ArrayList<>();
+    @NonNull
+    private final LinkedHashSet<String> addingNewIngredientToDishHashSet = new LinkedHashSet<>();
+    @NonNull
+    private final ArrayList<IngredientApiModel> ingredientArrayList = new ArrayList<>();
+    @NonNull
+    private final ArrayList<IngredientApiModel> choosenIngredients = new ArrayList<>();
+    @Nullable
     private Bitmap selectedImage;
+    @NonNull
     private IngredientsRecyclerAdapter ingredientsRecyclerAdapter;
-    private ArrayAdapter<String> spinnerAdapter;
+    @NonNull
     private AddNewDishMVP.Presenter presenter;
 
 
@@ -133,7 +140,8 @@ public class AddNewDishFragment extends Fragment implements AddNewDishMVP.View {
             listSpinnerItems.add(ingredients.get(i).getName());
             ingredientArrayList.add(ingredients.get(i));
         }
-        spinnerAdapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), android.R.layout.simple_list_item_1, listSpinnerItems);
+        @NonNull
+        final ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), android.R.layout.simple_list_item_1, listSpinnerItems);
         fragmentAddNewDishBinding.ingredientsSpinner.setAdapter(spinnerAdapter);
     }
 

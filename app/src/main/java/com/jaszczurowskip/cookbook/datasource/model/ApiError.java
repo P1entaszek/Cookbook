@@ -7,12 +7,15 @@ import android.support.annotation.NonNull;
  */
 
 public class ApiError {
-
     private long timestamp;
     private int status;
+    @NonNull
     private String error;
+    @NonNull
     private String exception;
+    @NonNull
     private String message;
+    @NonNull
     private String path;
 
     public static ApiError getServerConnectionError(final @NonNull String msg) {
@@ -30,18 +33,22 @@ public class ApiError {
         return status;
     }
 
+    @NonNull
     public String getError() {
         return error;
     }
 
+    @NonNull
     public String getException() {
         return exception;
     }
 
+    @NonNull
     public String getMessage() {
         return message;
     }
 
+    @NonNull
     public String getPath() {
         return path;
     }

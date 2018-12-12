@@ -12,7 +12,9 @@ import java.util.List;
  */
 public class DishesListPresenter implements DishesListMVP.Presenter {
 
+    @NonNull
     private final DishesListMVP.Interactor interactor;
+    @NonNull
     private DishesListMVP.View view;
 
     public DishesListPresenter() {

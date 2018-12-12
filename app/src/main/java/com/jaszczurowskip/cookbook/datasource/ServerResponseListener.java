@@ -1,5 +1,7 @@
 package com.jaszczurowskip.cookbook.datasource;
 
+import android.support.annotation.Nullable;
+
 import com.jaszczurowskip.cookbook.datasource.model.ApiError;
 
 /**
@@ -7,7 +9,7 @@ import com.jaszczurowskip.cookbook.datasource.model.ApiError;
  */
 public interface ServerResponseListener<T> {
 
-    void onSuccess(T response);
+    void onSuccess(final @Nullable T response);
 
-    void onError(ApiError error);
+    void onError(final @Nullable ApiError error);
 }

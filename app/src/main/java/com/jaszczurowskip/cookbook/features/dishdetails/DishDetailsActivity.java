@@ -2,6 +2,7 @@ package com.jaszczurowskip.cookbook.features.dishdetails;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 
@@ -16,7 +17,8 @@ public class DishDetailsActivity extends BaseActivity {
     protected void onCreate(final @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dish_details);
-        Intent i = getIntent();
+        @NonNull
+        final Intent i = getIntent();
         if (i.hasExtra(EXTRA_ITEM_ID)) {
             String dish = i.getStringExtra(EXTRA_ITEM_ID);
             FragmentManager manager = getSupportFragmentManager();
