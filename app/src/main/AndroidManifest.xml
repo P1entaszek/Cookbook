@@ -12,14 +12,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat">
-        <activity android:name=".features.mealslist.MealsListActivity">
+        <activity android:name=".features.disheslist.DishesListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".features.addnewmeal.AddNewMealActivity" />
-        <activity android:name=".features.mealdetails.MealDetailsActivity" />
+        <activity android:name=".features.addnewdish.AddNewDishActivity" />
+        <activity android:name=".features.dishdetails.DishDetailsActivity" />
     </application>
 </manifest>

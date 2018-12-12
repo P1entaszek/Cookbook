@@ -1,26 +1,19 @@
-package com.jaszczurowskip.cookbook.features.mealslist;
+package com.jaszczurowskip.cookbook.features.disheslist;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
-import com.jaszczurowskip.cookbook.features.mealdetails.MealDetailsActivity;
-import com.jaszczurowskip.cookbook.utils.Utils;
+import com.jaszczurowskip.cookbook.features.dishdetails.DishDetailsActivity;
 
 import java.util.List;
 
@@ -30,12 +23,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by jaszczurowskip on 15.11.2018
  */
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.CustomView> {
-    private Context context;
+    private final Context context;
     private LayoutInflater layoutInflater;
-    private List<DishesApiModel> listOfData;
+    private final List<DishesApiModel> listOfData;
     private static final String EXTRA_ITEM_ID = "EXTRA_ITEM_ID";
 
-    public ListAdapter(Context context, List<DishesApiModel> listOfData) {
+    public ListAdapter(final @NonNull Context context, final @NonNull List<DishesApiModel> listOfData) {
         this.context = context;
         this.listOfData = listOfData;
     }
@@ -43,7 +36,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.CustomView> {
     @NonNull
 
     @Override
-    public ListAdapter.CustomView onCreateViewHolder(@NonNull ViewGroup parent, int position) {
+    public ListAdapter.CustomView onCreateViewHolder(final @NonNull ViewGroup parent, final @NonNull int position) {
         if (layoutInflater == null) {
             layoutInflater = LayoutInflater.from(parent.getContext());
         }
@@ -52,7 +45,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.CustomView> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ListAdapter.CustomView customView, int position) {
+    public void onBindViewHolder(final @NonNull ListAdapter.CustomView customView, final int position) {
         DishesApiModel currentItem = listOfData.get(position);
         Glide.with(context).load(currentItem.getPicture()).into(customView.mealImage);
         customView.mealName.setText(currentItem.getName());
@@ -68,7 +61,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.CustomView> {
         TextView mealName;
         ConstraintLayout constraintLayout;
 
-        CustomView(final View itemView) {
+        CustomView(final @NonNull View itemView) {
             super(itemView);
             this.mealImage = itemView.findViewById(R.id.imgv_list_item);
             this.mealName = itemView.findViewById(R.id.meal_name_tv);
@@ -82,8 +75,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.CustomView> {
         }
     }
 
-    private void startDetailActivity(int position) {
-        Intent i = new Intent(context, MealDetailsActivity.class);
+    private void startDetailActivity(final @NonNull int position) {
+        Intent i = new Intent(context, DishDetailsActivity.class);
         long id = listOfData.get(position).getId();
         i.putExtra(EXTRA_ITEM_ID, String.valueOf(id));
         context.startActivity(i);

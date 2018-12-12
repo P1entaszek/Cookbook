@@ -1,5 +1,7 @@
 package com.jaszczurowskip.cookbook.datasource.model;
 
+import android.support.annotation.NonNull;
+
 /**
  * Created by Jakub Mateusiak on 2016-06-29.
  */
@@ -13,12 +15,11 @@ public class ApiError {
     private String message;
     private String path;
 
-    public static ApiError getServerConnectionError(String msg) {
+    public static ApiError getServerConnectionError(final @NonNull String msg) {
         ApiError error = new ApiError();
         error.status = 500;
         error.message = msg;
         return error;
-
     }
 
     public long getTimestamp() {
