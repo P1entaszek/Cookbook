@@ -18,14 +18,22 @@ public interface DishesListMVP {
 
         void getAllSearchedDishes(final @Nullable CharSequence query, final @NonNull DishesListInteractorCallback callback);
 
+        void deleteDish(final int dishId, final @NonNull List<DishesApiModel> dishesList, final @NonNull DeletingDishInteractorCallback callback);
+
         interface DishesListInteractorCallback {
             void onGetDishesListSuccesCallback(final @NonNull List<DishesApiModel> dishesList);
 
             void onGetDishesListErrorCallback(final @NonNull ApiError apiError);
         }
+
+        interface DeletingDishInteractorCallback {
+            void onDeletingDishSuccesCallback(final @NonNull List<DishesApiModel> dishesList);
+
+            void onDeletingDishErrorCallback(final @NonNull ApiError apiError);
+        }
     }
 
-    interface Presenter extends Interactor.DishesListInteractorCallback{
+    interface Presenter extends Interactor.DishesListInteractorCallback, Interactor.DeletingDishInteractorCallback{
         void attach(final @NonNull View view);
 
         void gotDishesListFromService();
@@ -36,6 +44,7 @@ public interface DishesListMVP {
 
         void initView();
 
+        void deleteSwipedDish(int position, List<DishesApiModel> dishesList);
     }
 
     interface View {
@@ -51,5 +60,7 @@ public interface DishesListMVP {
         void setupSearchDishesListener();
 
         void setupAddNewMealListener();
+
+        void setupSwipeListener();
     }
 }

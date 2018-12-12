@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -37,6 +39,7 @@ import java.util.List;
 public class DishesListFragment extends Fragment implements DishesListMVP.View{
     private FragmentMealsListBinding fragmentMealsListBinding;
     private DishesListMVP.Presenter presenter;
+    private List<DishesApiModel> dishesList;
 
     public DishesListFragment() {
         // Required empty public constructor
@@ -55,6 +58,8 @@ public class DishesListFragment extends Fragment implements DishesListMVP.View{
         super.onViewCreated(view, savedInstanceState);
         presenter = new DishesListPresenter();
         presenter.attach(this);
+
+
     }
 
     @Override
@@ -70,7 +75,7 @@ public class DishesListFragment extends Fragment implements DishesListMVP.View{
     }
 
 
-   /* private ItemTouchHelper.Callback createHelperCallback() {
+    private ItemTouchHelper.Callback createHelperCallback() {
         return new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
@@ -84,30 +89,23 @@ public class DishesListFragment extends Fragment implements DishesListMVP.View{
             public void onSwiped(@NonNull final RecyclerView.ViewHolder viewHolder, @NonNull int swipeDir) {
                 final int position = viewHolder.getAdapterPosition();
                 deleteDish(position);
-                dishesList.clear();
-                fetchDataFromRemote();
             }
         };
     }
 
     private void deleteDish(int position) {
-        CookbookClient.getCookbookClient().deleteDish(position, dishesList, new ServerResponseListener<List<DishesApiModel>>() {
-            @Override
-            public void onSuccess(List<DishesApiModel> response) {
-                Toast.makeText(getContext(), R.string.dish_deleted, Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onError(ApiError error) {
-                Log.d(MEALS_LIST_FRAGMENT, error.getMessage());
-                Toast.makeText(getContext(), R.string.cant_delete_dish, Toast.LENGTH_LONG).show();
-            }
-        });
-    }*/
+        presenter.deleteSwipedDish(position, dishesList);
+    }
 
     @Override
     public void setupAddNewMealListener() {
         fragmentMealsListBinding.addNewMealFab.setOnClickListener(v -> Utils.startAnotherActivity(getContext(), AddNewDishActivity.class));
+    }
+
+    @Override
+    public void setupSwipeListener() {
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(createHelperCallback());
+        itemTouchHelper.attachToRecyclerView(fragmentMealsListBinding.mealsListRecycler);
     }
 
     @Override
@@ -156,6 +154,7 @@ public class DishesListFragment extends Fragment implements DishesListMVP.View{
 
     @Override
     public void showDishesList(final @NonNull List<DishesApiModel> dishesList) {
+        this.dishesList = dishesList;
         ListAdapter adapter;
         LinearLayoutManager layoutManager;
         layoutManager = new LinearLayoutManager(getActivity());
