@@ -44,7 +44,13 @@ public class DishesListPresenter implements DishesListMVP.Presenter {
         view.showProgressDialog();
         view.setupAddNewMealListener();
         view.setupSearchDishesListener();
+        view.setupSwipeListener();
         interactor.getAllDishesList(this);
+    }
+
+    @Override
+    public void deleteSwipedDish(int dishId, List<DishesApiModel> dishesList) {
+        interactor.deleteDish(dishId, dishesList, this);
     }
 
     @Override
@@ -56,6 +62,16 @@ public class DishesListPresenter implements DishesListMVP.Presenter {
     @Override
     public void onGetDishesListErrorCallback(final @NonNull ApiError apiError) {
         view.dismissProgressDialog();
+        view.showError(apiError.getMessage());
+    }
+
+    @Override
+    public void onDeletingDishSuccesCallback(final @NonNull List<DishesApiModel> dishesList) {
+        view.showDishesList(dishesList);
+    }
+
+    @Override
+    public void onDeletingDishErrorCallback(final @NonNull ApiError apiError) {
         view.showError(apiError.getMessage());
     }
 }
