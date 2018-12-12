@@ -1,6 +1,7 @@
 package com.jaszczurowskip.cookbook.features;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,22 +19,24 @@ import java.util.List;
  */
 public class IngredientsRecyclerAdapter extends RecyclerView.Adapter<IngredientsRecyclerAdapter.ViewHolder> {
 
-    private Context context;
-    private List<IngredientApiModel> list;
+    @NonNull
+    private final Context context;
+    @NonNull
+    private final List<IngredientApiModel> list;
 
-    public IngredientsRecyclerAdapter(Context context, List<IngredientApiModel> list) {
+    public IngredientsRecyclerAdapter(final @NonNull Context context, final @NonNull List<IngredientApiModel> list) {
         this.context = context;
         this.list = list;
     }
 
     @Override
-    public IngredientsRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public IngredientsRecyclerAdapter.ViewHolder onCreateViewHolder(final @NonNull ViewGroup parent, final @NonNull int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.ingredient_recycler_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(IngredientsRecyclerAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(final @NonNull IngredientsRecyclerAdapter.ViewHolder holder, final @NonNull int position) {
 
         holder.title.setText(list.get(position).getName());
     }
@@ -44,9 +47,9 @@ public class IngredientsRecyclerAdapter extends RecyclerView.Adapter<Ingredients
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView title;
+        private final TextView title;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(final @NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.ingredient);
         }

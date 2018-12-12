@@ -1,5 +1,7 @@
 package com.jaszczurowskip.cookbook.datasource.retrofit;
 
+import android.support.annotation.NonNull;
+
 import com.jaszczurowskip.cookbook.datasource.model.DishModelToPost;
 import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
 import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
@@ -26,17 +28,17 @@ public interface ApiService {
     Observable<List<IngredientApiModel>> getAllIngredients();
 
     @GET("dishes/{dishId}")
-    Observable<DishesApiModel> getDish(@Path("dishId") long dishID);
+    Observable<DishesApiModel> getDish(@Path("dishId") final long dishID);
 
     @GET("dishes?")
-    Observable<List<DishesApiModel>> getSearchedDishes(@Query("term") String term);
+    Observable<List<DishesApiModel>> getSearchedDishes(@Query("term") final @NonNull String term);
 
     @POST("ingredients")
-    Observable<String> postIngredient(@Body String string);
+    Observable<String> postIngredient(@Body final @NonNull String string);
 
     @POST("dishes")
-    Observable<DishModelToPost> postDish(@Body DishModelToPost dish);
+    Observable<DishModelToPost> postDish(@Body final @NonNull DishModelToPost dish);
 
     @DELETE("dishes/{dishId}")
-    Observable<DishModelToPost> deleteDish(@Path("dishId") long dishID);
+    Observable<DishModelToPost> deleteDish(@Path("dishId") final long dishID);
 }

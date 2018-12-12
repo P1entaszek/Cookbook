@@ -11,25 +11,25 @@ import java.util.List;
  * Created by jaszczurowskip on 20.11.2018
  */
 public class DishesApiModel {
-    @SerializedName("id")
     private long id;
-    @SerializedName("name")
+    @NonNull
     private String name;
-    @SerializedName("picture")
+    @NonNull
     private String picture;
-    @SerializedName("recipe")
+    @NonNull
     private String recipe;
-    @SerializedName("ingredients")
+    @NonNull
     private List<IngredientApiModel> ingredients;
 
     public long getId() {
         return id;
     }
 
-    public void setId(final @NonNull long id) {
+    public void setId(final long id) {
         this.id = id;
     }
 
+    @NonNull
     public String getName() {
         return name;
     }
@@ -38,6 +38,7 @@ public class DishesApiModel {
         this.name = name;
     }
 
+    @NonNull
     public String getPicture() {
         return picture;
     }
@@ -46,6 +47,7 @@ public class DishesApiModel {
         this.picture = picture;
     }
 
+    @NonNull
     public String getRecipe() {
         return recipe;
     }
@@ -54,11 +56,12 @@ public class DishesApiModel {
         this.recipe = recipe;
     }
 
+    @NonNull
     public List<IngredientApiModel> getIngredients() {
         return ingredients;
     }
 
-    public void setIngredients(final @Nullable List<IngredientApiModel> ingredients) {
+    public void setIngredients(final @NonNull List<IngredientApiModel> ingredients) {
         this.ingredients = ingredients;
     }
 }
