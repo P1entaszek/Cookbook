@@ -1,5 +1,8 @@
 package com.jaszczurowskip.cookbook.datasource.model;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -23,7 +26,7 @@ public class DishesApiModel {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(final @NonNull long id) {
         this.id = id;
     }
 
@@ -31,7 +34,7 @@ public class DishesApiModel {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final @NonNull String name) {
         this.name = name;
     }
 
@@ -39,7 +42,7 @@ public class DishesApiModel {
         return picture;
     }
 
-    public void setPicture(String picture) {
+    public void setPicture(final @NonNull String picture) {
         this.picture = picture;
     }
 
@@ -47,7 +50,7 @@ public class DishesApiModel {
         return recipe;
     }
 
-    public void setRecipe(String recipe) {
+    public void setRecipe(final @NonNull String recipe) {
         this.recipe = recipe;
     }
 
@@ -55,7 +58,7 @@ public class DishesApiModel {
         return ingredients;
     }
 
-    public void setIngredients(List<IngredientApiModel> ingredients) {
+    public void setIngredients(final @Nullable List<IngredientApiModel> ingredients) {
         this.ingredients = ingredients;
     }
 }

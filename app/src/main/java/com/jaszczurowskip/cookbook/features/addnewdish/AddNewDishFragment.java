@@ -5,12 +5,10 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,30 +22,28 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 import com.jaszczurowskip.cookbook.R;
 import com.jaszczurowskip.cookbook.databinding.FragmentAddNewMealBinding;
-import com.jaszczurowskip.cookbook.datasource.CookbookClient;
-import com.jaszczurowskip.cookbook.datasource.ServerResponseListener;
-import com.jaszczurowskip.cookbook.datasource.model.ApiError;
 import com.jaszczurowskip.cookbook.datasource.model.DishModelToPost;
 import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
 import com.jaszczurowskip.cookbook.features.IngredientsRecyclerAdapter;
+import com.jaszczurowskip.cookbook.features.addnewdish.mvp.AddNewDishMVP;
+import com.jaszczurowskip.cookbook.features.addnewdish.mvp.AddNewDishPresenter;
 import com.jaszczurowskip.cookbook.features.disheslist.DishesListActivity;
+import com.jaszczurowskip.cookbook.utils.Utils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-
-import static android.app.Activity.RESULT_OK;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AddNewDishFragment extends Fragment {
+public class AddNewDishFragment extends Fragment implements AddNewDishMVP.View {
+    private static final int WRONG_DISH_NAME = 0;
+    private static final int WRONG_DISH_DESCRIPTION = 1;
+    private static final int ERROR_WHEN_ULOAD_PHOTO = 2;
+    private static final int DIDNT_CHOOSE_INGREDIENTS = 3;
     private static int RESULT_LOAD_IMG = 0;
-    private static String ADD_NEW_MEAL_FRAGMENT = "ADD_NEW_MEAL_FRAGMENT";
-    private static String typeOfImage = "data:image/jpeg;base64,";
     private FragmentAddNewMealBinding fragmentAddNewMealBinding;
     private ArrayList<String> listSpinnerItems = new ArrayList<>();
     private LinkedHashSet<String> addingNewIngredientToDishHashSet = new LinkedHashSet<>();
@@ -56,6 +52,7 @@ public class AddNewDishFragment extends Fragment {
     private Bitmap selectedImage;
     private IngredientsRecyclerAdapter ingredientsRecyclerAdapter;
     private ArrayAdapter<String> spinnerAdapter;
+    private AddNewDishMVP.Presenter presenter;
 
 
     public AddNewDishFragment() {
@@ -66,77 +63,22 @@ public class AddNewDishFragment extends Fragment {
         return new AddNewDishFragment();
     }
 
-    public static String encodeToBase64(Bitmap image, Bitmap.CompressFormat compressFormat, int quality) {
-        ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
-        image.compress(compressFormat, quality, byteArrayOS);
-        return Base64.encodeToString(byteArrayOS.toByteArray(), Base64.NO_WRAP);
-    }
-
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        initView();
-        fetchIngredientsFromRemoteWithSpinner();
-        photoPickerListener();
-        addNewIngredientToSpinner();
-        addNewIngredientToDish();
-        sendNewDishToRemote();
     }
 
-    public boolean validatePostNewDish(DishModelToPost dishModelToPost) {
-        boolean valid = true;
-        String generalToast = getString(R.string.wrong_filled_dish_form);
-        String newLine = getString(R.string.new_line);
-        if (dishModelToPost.getIngredientIds().isEmpty()) {
-            generalToast = generalToast.concat(newLine).concat(getString(R.string.you_didnt_choose_dish_ingredients));
-            valid = false;
-        }
-        if (dishModelToPost.getName().isEmpty()) {
-            generalToast = generalToast.concat(newLine).concat(getString(R.string.you_didnt_type_dish_name));
-            fragmentAddNewMealBinding.mealNameEt.setError(getString(R.string.you_didnt_type_dish_name));
-            valid = false;
-        }
-        if (dishModelToPost.getRecipe().isEmpty()) {
-            generalToast = generalToast.concat(newLine).concat(getString(R.string.you_didnt_type_dish_description));
-            fragmentAddNewMealBinding.mealDescriptionTv.setError(getString(R.string.you_didnt_type_dish_description));
-            valid = false;
-        }
-        if (dishModelToPost.getPicture() == null) {
-            generalToast = generalToast.concat(newLine).concat(getString(R.string.you_didnt_choose_dish_picture));
-            valid = false;
-        }
-        if (!valid) Toast.makeText(getContext(), generalToast, Toast.LENGTH_LONG).show();
-        return valid;
-    }
-
-    public void sendNewDishToRemote() {
-        fragmentAddNewMealBinding.acceptAddingMealBttn.setOnClickListener(v -> {
-            if (validatePostNewDish(preparedNewDishToPost())) {
-                CookbookClient.getCookbookClient().sendDishToServer(preparedNewDishToPost(), new ServerResponseListener<DishModelToPost>() {
-                    @Override
-                    public void onSuccess(DishModelToPost response) {
-                        Toast.makeText(getContext(), R.string.added_new_dish, Toast.LENGTH_LONG).show();
-                        clearForm();
-                        startListActivity();
-                    }
-
-                    @Override
-                    public void onError(ApiError error) {
-                        Toast.makeText(getContext(), R.string.please_check_your_internet_connection, Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
-        });
-    }
-
-    private void startListActivity() {
-        Intent i = new Intent(getContext(), DishesListActivity.class);
-        getContext().startActivity(i);
+    @Override
+    public void onViewCreated(@NonNull final View view, @Nullable final Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        presenter = new AddNewDishPresenter();
+        presenter.attach(this);
+        presenter.initView();
     }
 
     private DishModelToPost preparedNewDishToPost() {
         String preparedImageToPost = null;
         if (selectedImage != null) {
-            preparedImageToPost = typeOfImage.concat(encodeToBase64(selectedImage, Bitmap.CompressFormat.JPEG, 20));
+            preparedImageToPost = Utils.encodeToBase64(selectedImage, Bitmap.CompressFormat.JPEG, 20);
         }
         DishModelToPost newDish = new DishModelToPost();
         newDish.setName(fragmentAddNewMealBinding.mealNameEt.getText().toString());
@@ -150,79 +92,61 @@ public class AddNewDishFragment extends Fragment {
         return newDish;
     }
 
-    private void initView() {
+    @Override
+    public void onActivityResult(int reqCode, int resultCode, Intent data) {
+        super.onActivityResult(reqCode, resultCode, data);
+        presenter.getPicture(reqCode, resultCode, data, getActivity());
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        fragmentAddNewMealBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_add_new_meal, container, false);
+        return fragmentAddNewMealBinding.getRoot();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        presenter.destroy();
+    }
+
+    @Override
+    public void prepareIngredientsRecycler() {
         FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
         layoutManager.setFlexDirection(FlexDirection.ROW);
         layoutManager.setJustifyContent(JustifyContent.FLEX_START);
         fragmentAddNewMealBinding.ingredientsRv.setLayoutManager(layoutManager);
     }
 
-    private void fetchIngredientsFromRemoteWithSpinner() {
-        CookbookClient.getCookbookClient().getAllIngredients(new ServerResponseListener<List<IngredientApiModel>>() {
-            @Override
-            public void onSuccess(List<IngredientApiModel> ingredients) {
-                listSpinnerItems.clear();
-                listSpinnerItems.add(getString(R.string.choose_some_ingredients));
-                for (int i = 0; i < ingredients.size(); i++) {
-                    listSpinnerItems.add(ingredients.get(i).getName());
-                    ingredientArrayList.add(ingredients.get(i));
-                }
-                spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, listSpinnerItems);
-                fragmentAddNewMealBinding.ingredientsSpinner.setAdapter(spinnerAdapter);
-            }
-
-            @Override
-            public void onError(ApiError error) {
-                Log.d(ADD_NEW_MEAL_FRAGMENT, error.getMessage());
-                Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+    @Override
+    public void showGeneralError(@NonNull String error) {
+        Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
     }
 
-    private void clearForm() {
-        choosenIngredients.clear();
-        addingNewIngredientToDishHashSet.clear();
-        ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), choosenIngredients);
-        fragmentAddNewMealBinding.ingredientsRv.setAdapter(ingredientsRecyclerAdapter);
-        fragmentAddNewMealBinding.mealDescriptionTv.setText("");
-        fragmentAddNewMealBinding.mealNameEt.setText("");
-        fragmentAddNewMealBinding.mealNameImg.setImageDrawable(getResources().getDrawable(R.drawable.select_photo));
+    @Override
+    public void showAllIngredients(@NonNull List<IngredientApiModel> ingredients) {
+        listSpinnerItems.clear();
+        listSpinnerItems.add(getString(R.string.choose_some_ingredients));
+        for (int i = 0; i < ingredients.size(); i++) {
+            listSpinnerItems.add(ingredients.get(i).getName());
+            ingredientArrayList.add(ingredients.get(i));
+        }
+        spinnerAdapter = new ArrayAdapter<>(Objects.requireNonNull(getContext()), android.R.layout.simple_list_item_1, listSpinnerItems);
         fragmentAddNewMealBinding.ingredientsSpinner.setAdapter(spinnerAdapter);
     }
 
-    private void addNewIngredientToSpinner() {
-        fragmentAddNewMealBinding.addIngredientsBttn.setOnClickListener(v -> {
-            final EditText taskEditText = new EditText(getContext());
-            final AlertDialog dialog = new AlertDialog.Builder(getContext())
-                    .setTitle(getString(R.string.add_new_ingredient))
-                    .setView(taskEditText)
-                    .setPositiveButton(R.string.add, (dialog1, which) -> {
-                        String ingredient = String.valueOf(taskEditText.getText());
-                        if (!ingredient.isEmpty()) {
-                            CookbookClient.getCookbookClient().sendIngredientToServer(ingredient, new ServerResponseListener<String>() {
-                                @Override
-                                public void onSuccess(String response) {
-                                    Toast.makeText(getContext(), R.string.ingredient_added_to_server, Toast.LENGTH_LONG).show();
-                                    fetchIngredientsFromRemoteWithSpinner();
-                                }
-
-                                @Override
-                                public void onError(ApiError error) {
-                                    Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_LONG).show();
-                                }
-                            });
-
-                        } else {
-                            Toast.makeText(getContext(), R.string.new_ingredient_must_contain_name, Toast.LENGTH_LONG).show();
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, null)
-                    .create();
-            dialog.show();
+    @Override
+    public void setupAddNewDishListener() {
+        fragmentAddNewMealBinding.acceptAddingMealBttn.setOnClickListener(v -> {
+            if (presenter.validateNewDishBeforePost(getContext(), preparedNewDishToPost())) {
+                presenter.sendDishToServer(preparedNewDishToPost());
+            }
         });
     }
 
-    private void addNewIngredientToDish() {
+    @Override
+    public void addNewIngredientToDishFromList() {
         fragmentAddNewMealBinding.ingredientsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -244,7 +168,36 @@ public class AddNewDishFragment extends Fragment {
         });
     }
 
-    private void photoPickerListener() {
+    @Override
+    public void setupAddNewIngredientListener() {
+        fragmentAddNewMealBinding.addIngredientsBttn.setOnClickListener(v -> {
+            final EditText taskEditText = new EditText(getContext());
+            final AlertDialog dialog = new AlertDialog.Builder(getContext())
+                    .setTitle(getString(R.string.add_new_ingredient))
+                    .setView(taskEditText)
+                    .setPositiveButton(R.string.add, (dialog1, which) -> {
+                        String ingredient = String.valueOf(taskEditText.getText());
+                        if (!ingredient.isEmpty()) {
+                            presenter.sendIngredientToServer(ingredient);
+                        } else {
+                            Toast.makeText(getContext(), R.string.new_ingredient_must_contain_name, Toast.LENGTH_LONG).show();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, null)
+                    .create();
+            dialog.show();
+        });
+    }
+
+    @Override
+    public void onAddedNewDish() {
+        Toast.makeText(getContext(), R.string.added_new_dish, Toast.LENGTH_LONG).show();
+        Intent i = new Intent(getContext(), DishesListActivity.class);
+        getContext().startActivity(i);
+    }
+
+    @Override
+    public void setupPhotoPickerListener() {
         fragmentAddNewMealBinding.mealNameImg.setOnClickListener(view -> {
             Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
             photoPickerIntent.setType("image/*");
@@ -253,28 +206,29 @@ public class AddNewDishFragment extends Fragment {
     }
 
     @Override
-    public void onActivityResult(int reqCode, int resultCode, Intent data) {
-        super.onActivityResult(reqCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            try {
-                final Uri imageUri = data.getData();
-                final InputStream imageStream = getActivity().getContentResolver().openInputStream(imageUri);
-                selectedImage = BitmapFactory.decodeStream(imageStream);
-                fragmentAddNewMealBinding.mealNameImg.setImageBitmap(selectedImage);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                Toast.makeText(getContext(), R.string.error_when_uploading_files, Toast.LENGTH_LONG).show();
-            }
-
-        } else {
+    public void showFormError(@NonNull int errorCode) {
+        if (errorCode == WRONG_DISH_NAME) {
+            fragmentAddNewMealBinding.mealNameEt.setError(getString(R.string.you_didnt_type_dish_name));
+        }
+        if (errorCode == WRONG_DISH_DESCRIPTION) {
+            fragmentAddNewMealBinding.mealDescriptionTv.setError(getString(R.string.you_didnt_type_dish_description));
+        }
+        if (errorCode == ERROR_WHEN_ULOAD_PHOTO) {
+            Toast.makeText(getContext(), R.string.error_when_uploading_files, Toast.LENGTH_LONG).show();
+        }
+        if (errorCode == DIDNT_CHOOSE_INGREDIENTS) {
             Toast.makeText(getContext(), R.string.you_didnt_choose_dish_picture, Toast.LENGTH_LONG).show();
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        fragmentAddNewMealBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_add_new_meal, container, false);
-        return fragmentAddNewMealBinding.getRoot();
+    public void setupSpinner() {
+        presenter.gotIngredientsFromService();
+    }
+
+    @Override
+    public void setPicture(Bitmap img) {
+        fragmentAddNewMealBinding.mealNameImg.setImageBitmap(img);
+        selectedImage = img;
     }
 }

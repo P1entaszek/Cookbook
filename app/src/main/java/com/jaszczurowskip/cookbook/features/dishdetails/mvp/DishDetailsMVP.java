@@ -14,9 +14,9 @@ public interface DishDetailsMVP {
         void getDishDetails(final @NonNull long dishID, final @NonNull DishDetailsInteractorCallback callback);
 
         interface DishDetailsInteractorCallback {
-            void onSuccessCallback(final @NonNull DishesApiModel dish);
+            void onGetDishDetailsSuccessCallback(final @NonNull DishesApiModel dish);
 
-            void onErrorCallback(final @NonNull ApiError error);
+            void onGetDishDetailsErrorCallback(final @NonNull ApiError error);
         }
     }
 
@@ -38,7 +38,7 @@ public interface DishDetailsMVP {
 
         void dismissProgressDialog();
 
-        void showError( final @NonNull String error);
+        void showError(final @NonNull String error);
 
         void displayDish(final @NonNull DishesApiModel dish);
     }

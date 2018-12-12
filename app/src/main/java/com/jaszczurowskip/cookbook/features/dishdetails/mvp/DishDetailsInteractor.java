@@ -17,12 +17,12 @@ public class DishDetailsInteractor implements DishDetailsMVP.Interactor {
         CookbookClient.getCookbookClient().getDish(dishID, new ServerResponseListener<DishesApiModel>() {
             @Override
             public void onSuccess(final @NonNull DishesApiModel response) {
-                callback.onSuccessCallback(response);
+                callback.onGetDishDetailsSuccessCallback(response);
             }
 
             @Override
             public void onError(final @NonNull ApiError error) {
-                callback.onErrorCallback(error);
+                callback.onGetDishDetailsErrorCallback(error);
             }
         });
     }

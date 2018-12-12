@@ -13,18 +13,18 @@ import java.util.List;
 /**
  * Created by jaszczurowskip on 10.12.2018
  */
-public class DishesListInteractot implements DishesListMVP.Interactor {
+public class DishesListInteractor implements DishesListMVP.Interactor {
     @Override
     public void getAllDishesList(final @NonNull DishesListInteractorCallback callback) {
         CookbookClient.getCookbookClient().getAllDishes(new ServerResponseListener<List<DishesApiModel>>() {
             @Override
             public void onSuccess(List<DishesApiModel> dishesList) {
-                callback.onSuccesCallback(dishesList);
+                callback.onGetDishesListSuccesCallback(dishesList);
             }
 
             @Override
             public void onError(ApiError error) {
-                callback.onErrorCallback(error);
+                callback.onGetDishesListErrorCallback(error);
             }
         });
     }
@@ -34,12 +34,12 @@ public class DishesListInteractot implements DishesListMVP.Interactor {
         CookbookClient.getCookbookClient().getSearchedDishes(query, new ServerResponseListener<List<DishesApiModel>>() {
             @Override
             public void onSuccess(List<DishesApiModel> dishesList) {
-                callback.onSuccesCallback(dishesList);
+                callback.onGetDishesListSuccesCallback(dishesList);
             }
 
             @Override
             public void onError(ApiError error) {
-                callback.onErrorCallback(error);
+                callback.onGetDishesListErrorCallback(error);
             }
         });
     }

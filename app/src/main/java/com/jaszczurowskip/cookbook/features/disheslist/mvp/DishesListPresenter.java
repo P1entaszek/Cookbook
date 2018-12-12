@@ -12,11 +12,11 @@ import java.util.List;
  */
 public class DishesListPresenter implements DishesListMVP.Presenter {
 
-    private DishesListMVP.Interactor interactor;
+    private final DishesListMVP.Interactor interactor;
     private DishesListMVP.View view;
 
     public DishesListPresenter() {
-        this.interactor = new DishesListInteractot();
+        this.interactor = new DishesListInteractor();
     }
 
     @Override
@@ -48,13 +48,13 @@ public class DishesListPresenter implements DishesListMVP.Presenter {
     }
 
     @Override
-    public void onSuccesCallback(final @NonNull List<DishesApiModel> dishesList) {
+    public void onGetDishesListSuccesCallback(final @NonNull List<DishesApiModel> dishesList) {
         view.dismissProgressDialog();
         view.showDishesList(dishesList);
     }
 
     @Override
-    public void onErrorCallback(final @NonNull ApiError apiError) {
+    public void onGetDishesListErrorCallback(final @NonNull ApiError apiError) {
         view.dismissProgressDialog();
         view.showError(apiError.getMessage());
     }

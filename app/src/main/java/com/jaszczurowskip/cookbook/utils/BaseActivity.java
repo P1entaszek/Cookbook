@@ -1,6 +1,7 @@
 package com.jaszczurowskip.cookbook.utils;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -17,13 +18,13 @@ import java.util.ArrayList;
  */
 public abstract class BaseActivity extends AppCompatActivity {
 
-    public static void addFragmentToActivity(FragmentManager fragmentManager, Fragment fragment, int frameId, String tag) {
+    public static void addFragmentToActivity(final @NonNull FragmentManager fragmentManager, final @NonNull Fragment fragment, final int frameId, final @NonNull String tag) {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(frameId, fragment, tag);
         fragmentTransaction.commit();
     }
 
-    public static void centerTitle(Activity activity) {
+    public static void centerTitle(final @NonNull Activity activity) {
         ArrayList<View> textViews = new ArrayList<>();
         activity.getWindow().getDecorView().findViewsWithText(textViews, activity.getTitle(), View.FIND_VIEWS_WITH_TEXT);
         if (!textViews.isEmpty()) {
@@ -38,7 +39,6 @@ public abstract class BaseActivity extends AppCompatActivity {
                     }
                 }
             }
-
             if (appCompatTextView != null) {
                 ViewGroup.LayoutParams params = appCompatTextView.getLayoutParams();
                 params.width = ViewGroup.LayoutParams.MATCH_PARENT;

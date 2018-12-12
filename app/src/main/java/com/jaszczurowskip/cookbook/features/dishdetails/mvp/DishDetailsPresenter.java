@@ -11,7 +11,7 @@ import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
 public class DishDetailsPresenter implements DishDetailsMVP.Presenter{
 
     private DishDetailsMVP.View view;
-    private DishDetailsMVP.Interactor interactor;
+    private final DishDetailsMVP.Interactor interactor;
 
     public DishDetailsPresenter() {
         this.interactor = new DishDetailsInteractor();
@@ -39,13 +39,13 @@ public class DishDetailsPresenter implements DishDetailsMVP.Presenter{
     }
 
     @Override
-    public void onSuccessCallback(final @NonNull DishesApiModel dish) {
+    public void onGetDishDetailsSuccessCallback(final @NonNull DishesApiModel dish) {
         view.dismissProgressDialog();
         view.displayDish(dish);
     }
 
     @Override
-    public void onErrorCallback(final @NonNull ApiError apiError) {
+    public void onGetDishDetailsErrorCallback(final @NonNull ApiError apiError) {
         view.dismissProgressDialog();
         view.showError(apiError.getMessage());
     }

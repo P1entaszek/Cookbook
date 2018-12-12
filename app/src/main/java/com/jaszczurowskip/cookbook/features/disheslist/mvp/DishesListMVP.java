@@ -19,9 +19,9 @@ public interface DishesListMVP {
         void getAllSearchedDishes(final @Nullable CharSequence query, final @NonNull DishesListInteractorCallback callback);
 
         interface DishesListInteractorCallback {
-            void onSuccesCallback(final @NonNull List<DishesApiModel> dishesList);
+            void onGetDishesListSuccesCallback(final @NonNull List<DishesApiModel> dishesList);
 
-            void onErrorCallback(final @NonNull ApiError apiError);
+            void onGetDishesListErrorCallback(final @NonNull ApiError apiError);
         }
     }
 

@@ -8,6 +8,7 @@ import com.jaszczurowskip.cookbook.datasource.model.IngredientApiModel;
 import com.jaszczurowskip.cookbook.datasource.retrofit.ApiService;
 import com.jaszczurowskip.cookbook.datasource.retrofit.RetrofitClient;
 import com.jaszczurowskip.cookbook.utils.rx.AppSchedulersProvider;
+import com.jaszczurowskip.cookbook.utils.rx.RetryWithDelay;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -245,33 +246,5 @@ public class CookbookClient {
                         //no-op
                     }
                 });
-    }
-
-    public class RetryWithDelay implements Function<Observable<? extends Throwable>, Observable<?>> {
-        private final int maxRetries;
-        private final int retryDelaySeconds;
-        private int retryCount;
-
-        public RetryWithDelay(final int maxRetries, final int retryDelaySeconds) {
-            this.maxRetries = maxRetries;
-            this.retryDelaySeconds = retryDelaySeconds;
-            this.retryCount = 0;
-        }
-
-        @Override
-        public Observable<?> apply(final Observable<? extends Throwable> attempts) {
-            return attempts
-                    .flatMap((Function<Throwable, Observable<?>>) throwable -> {
-                        if (++retryCount < maxRetries) {
-                            // When this Observable calls onNext, the original
-                            // Observable will be retried (i.e. re-subscribed).
-                            return Observable.timer(retryDelaySeconds,
-                                    TimeUnit.SECONDS);
-                        }
-
-                        // Max retries hit. Just pass the error along.
-                        return Observable.error(throwable);
-                    });
-        }
     }
 }
