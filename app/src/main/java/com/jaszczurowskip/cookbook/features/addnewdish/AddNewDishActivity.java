@@ -12,7 +12,7 @@ public class AddNewDishActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_new_meal);
+        setContentView(R.layout.activity_add_new_dish);
         FragmentManager manager = getSupportFragmentManager();
         AddNewDishFragment fragment = (AddNewDishFragment) manager.findFragmentByTag(ADD_NEW_MEAL_FRAG);
         if (fragment == null) {

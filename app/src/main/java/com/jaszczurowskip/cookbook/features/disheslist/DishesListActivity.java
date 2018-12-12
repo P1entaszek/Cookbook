@@ -12,7 +12,7 @@ public class DishesListActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_meals_list);
+        setContentView(R.layout.activity_dish_list);
         FragmentManager manager = getSupportFragmentManager();
         DishesListFragment fragment = (DishesListFragment) manager.findFragmentByTag(MEAL_LIST_FRAG);
         if (fragment == null) {

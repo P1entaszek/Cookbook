@@ -11,22 +11,15 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.github.ybq.android.spinkit.sprite.Sprite;
-import com.github.ybq.android.spinkit.style.FadingCircle;
 import com.jaszczurowskip.cookbook.R;
-import com.jaszczurowskip.cookbook.databinding.FragmentMealsListBinding;
-import com.jaszczurowskip.cookbook.datasource.CookbookClient;
-import com.jaszczurowskip.cookbook.datasource.ServerResponseListener;
-import com.jaszczurowskip.cookbook.datasource.model.ApiError;
+import com.jaszczurowskip.cookbook.databinding.FragmentDishesListBinding;
 import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
 import com.jaszczurowskip.cookbook.features.addnewdish.AddNewDishActivity;
-import com.jaszczurowskip.cookbook.features.dishdetails.mvp.DishDetailsPresenter;
 import com.jaszczurowskip.cookbook.features.disheslist.mvp.DishesListMVP;
 import com.jaszczurowskip.cookbook.features.disheslist.mvp.DishesListPresenter;
 import com.jaszczurowskip.cookbook.utils.Utils;
@@ -36,8 +29,8 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DishesListFragment extends Fragment implements DishesListMVP.View{
-    private FragmentMealsListBinding fragmentMealsListBinding;
+public class DishesListFragment extends Fragment implements DishesListMVP.View {
+    private FragmentDishesListBinding fragmentDishesListBinding;
     private DishesListMVP.Presenter presenter;
     private List<DishesApiModel> dishesList;
 
@@ -59,7 +52,6 @@ public class DishesListFragment extends Fragment implements DishesListMVP.View{
         presenter = new DishesListPresenter();
         presenter.attach(this);
 
-
     }
 
     @Override
@@ -73,7 +65,6 @@ public class DishesListFragment extends Fragment implements DishesListMVP.View{
         super.onStart();
         presenter.initView();
     }
-
 
     private ItemTouchHelper.Callback createHelperCallback() {
         return new ItemTouchHelper.SimpleCallback(0,
@@ -99,18 +90,18 @@ public class DishesListFragment extends Fragment implements DishesListMVP.View{
 
     @Override
     public void setupAddNewMealListener() {
-        fragmentMealsListBinding.addNewMealFab.setOnClickListener(v -> Utils.startAnotherActivity(getContext(), AddNewDishActivity.class));
+        fragmentDishesListBinding.addNewMealFab.setOnClickListener(v -> Utils.startAnotherActivity(getContext(), AddNewDishActivity.class));
     }
 
     @Override
     public void setupSwipeListener() {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(createHelperCallback());
-        itemTouchHelper.attachToRecyclerView(fragmentMealsListBinding.mealsListRecycler);
+        itemTouchHelper.attachToRecyclerView(fragmentDishesListBinding.mealsListRecycler);
     }
 
     @Override
-    public  void setupSearchDishesListener() {
-        fragmentMealsListBinding.searchIngredientsBar.addTextChangedListener(new TextWatcher() {
+    public void setupSearchDishesListener() {
+        fragmentDishesListBinding.searchIngredientsBar.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(final CharSequence s, final int start, final int count, final int after) {
 
@@ -131,20 +122,20 @@ public class DishesListFragment extends Fragment implements DishesListMVP.View{
     @Override
     public View onCreateView(final @NonNull LayoutInflater inflater, final @NonNull ViewGroup container,
                              final @Nullable Bundle savedInstanceState) {
-        fragmentMealsListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_meals_list, container, false);
-        return fragmentMealsListBinding.getRoot();
+        fragmentDishesListBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_dishes_list, container, false);
+        return fragmentDishesListBinding.getRoot();
     }
 
     @Override
     public void showProgressDialog() {
-        fragmentMealsListBinding.mealsListRecycler.setVisibility(View.INVISIBLE);
-        fragmentMealsListBinding.progressBar.setVisibility(View.VISIBLE);
+        fragmentDishesListBinding.mealsListRecycler.setVisibility(View.INVISIBLE);
+        fragmentDishesListBinding.progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void dismissProgressDialog() {
-        fragmentMealsListBinding.mealsListRecycler.setVisibility(View.VISIBLE);
-        fragmentMealsListBinding.progressBar.setVisibility(View.INVISIBLE);
+        fragmentDishesListBinding.mealsListRecycler.setVisibility(View.VISIBLE);
+        fragmentDishesListBinding.progressBar.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -158,8 +149,8 @@ public class DishesListFragment extends Fragment implements DishesListMVP.View{
         ListAdapter adapter;
         LinearLayoutManager layoutManager;
         layoutManager = new LinearLayoutManager(getActivity());
-        fragmentMealsListBinding.mealsListRecycler.setLayoutManager(layoutManager);
+        fragmentDishesListBinding.mealsListRecycler.setLayoutManager(layoutManager);
         adapter = new ListAdapter(getContext(), dishesList);
-        fragmentMealsListBinding.mealsListRecycler.setAdapter(adapter);
+        fragmentDishesListBinding.mealsListRecycler.setAdapter(adapter);
     }
 }

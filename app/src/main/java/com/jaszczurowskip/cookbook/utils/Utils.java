@@ -19,7 +19,7 @@ public class Utils {
         context.startActivity(i);
     }
 
-    public static String encodeToBase64(Bitmap image, Bitmap.CompressFormat compressFormat, int quality) {
+    public static String encodeToBase64(final @NonNull Bitmap image, final @NonNull Bitmap.CompressFormat compressFormat, final @NonNull int quality) {
         ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
         image.compress(compressFormat, quality, byteArrayOS);
         return typeOfImage.concat(Base64.encodeToString(byteArrayOS.toByteArray(), Base64.NO_WRAP));

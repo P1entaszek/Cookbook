@@ -21,7 +21,7 @@ import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 import com.jaszczurowskip.cookbook.R;
-import com.jaszczurowskip.cookbook.databinding.FragmentMealDetailsBinding;
+import com.jaszczurowskip.cookbook.databinding.FragmentDishDetailsBinding;
 import com.jaszczurowskip.cookbook.datasource.model.DishesApiModel;
 import com.jaszczurowskip.cookbook.features.IngredientsRecyclerAdapter;
 import com.jaszczurowskip.cookbook.features.dishdetails.mvp.DishDetailsMVP;
@@ -34,7 +34,7 @@ import java.util.Objects;
  */
 public class DishDetailsFragment extends Fragment implements DishDetailsMVP.View {
     private static final String EXTRA_ITEM_ID = "EXTRA_ITEM_ID";
-    private FragmentMealDetailsBinding fragmentMealDetailsBinding;
+    private FragmentDishDetailsBinding fragmentDishDetailsBinding;
     private long dishId;
     private DishDetailsPresenter presenter;
 
@@ -73,8 +73,8 @@ public class DishDetailsFragment extends Fragment implements DishDetailsMVP.View
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, @NonNull final ViewGroup container,
                              @Nullable final Bundle savedInstanceState) {
-        fragmentMealDetailsBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_meal_details, container, false);
-        return fragmentMealDetailsBinding.getRoot();
+        fragmentDishDetailsBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_dish_details, container, false);
+        return fragmentDishDetailsBinding.getRoot();
     }
 
     @Override
@@ -86,22 +86,22 @@ public class DishDetailsFragment extends Fragment implements DishDetailsMVP.View
     @Override
     public void setupview() {
         Sprite progressBar = new FadingCircle();
-        fragmentMealDetailsBinding.progressBar.setIndeterminateDrawable(progressBar);
+        fragmentDishDetailsBinding.progressBar.setIndeterminateDrawable(progressBar);
         FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
         layoutManager.setFlexDirection(FlexDirection.ROW);
         layoutManager.setJustifyContent(JustifyContent.FLEX_START);
-        fragmentMealDetailsBinding.recyclerView.setLayoutManager(layoutManager);
+        fragmentDishDetailsBinding.recyclerView.setLayoutManager(layoutManager);
         presenter.gotDishFromService(dishId);
     }
 
     @Override
     public void showProgressDialog() {
-        fragmentMealDetailsBinding.progressBar.setVisibility(View.VISIBLE);
+        fragmentDishDetailsBinding.progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void dismissProgressDialog() {
-        fragmentMealDetailsBinding.progressBar.setVisibility(View.INVISIBLE);
+        fragmentDishDetailsBinding.progressBar.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -112,12 +112,12 @@ public class DishDetailsFragment extends Fragment implements DishDetailsMVP.View
     @Override
     public void displayDish(final @NonNull DishesApiModel dishesApiModel) {
         IngredientsRecyclerAdapter ingredientsRecyclerAdapter = new IngredientsRecyclerAdapter(getContext(), dishesApiModel.getIngredients());
-        fragmentMealDetailsBinding.recyclerView.setAdapter(ingredientsRecyclerAdapter);
-        fragmentMealDetailsBinding.mealNameTv.setText(dishesApiModel.getName());
-        fragmentMealDetailsBinding.mealDescriptionTv.setText(dishesApiModel.getRecipe());
+        fragmentDishDetailsBinding.recyclerView.setAdapter(ingredientsRecyclerAdapter);
+        fragmentDishDetailsBinding.mealNameTv.setText(dishesApiModel.getName());
+        fragmentDishDetailsBinding.mealDescriptionTv.setText(dishesApiModel.getRecipe());
         Glide.with(Objects.requireNonNull(getContext()))
                 .load(dishesApiModel.getPicture())
                 .apply(new RequestOptions().transforms(new CenterCrop(), new RoundedCorners(45)))
-                .into(fragmentMealDetailsBinding.mealImg);
+                .into(fragmentDishDetailsBinding.mealImg);
     }
 }
