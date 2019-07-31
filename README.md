@@ -2,6 +2,18 @@
 
 This is an application about adding new meals and searching them by typing ingredients that meal have. 
 
+## Technology stack
+
+In this application i used below libraries:
+- RxJava2
+- Retrofit2
+- Glide 
+- Flexbox
+- GSON
+- SpinKit
+
+Also application was made in MVP architecture
+
 ## Installation
 
 Clone this repository and import into **Android Studio**
