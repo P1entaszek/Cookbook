@@ -1,4 +1,4 @@
-## CookBook
+## Cookbook
 
 This is an application about adding new meals and searching them by typing ingredients that meal have. 
 
